@@ -22,9 +22,10 @@
 
 
 # Comandos GIT:
--**Fazer antes de programar**
+-Fazer antes de programar:
 -git pull
--**Fazer commit**
+
+-Fazer commit:
 - git add .
 - git commit -m "Descreva a alteração"
 - git push
