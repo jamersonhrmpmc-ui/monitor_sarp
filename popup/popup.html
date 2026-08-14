@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitor SARP</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+
+    <!-- Mensagem exibida fora do SARP -->
+    <div id="unavailableMessage" class="unavailable-message" style="display: none;">
+      <div class="unavailable-icon">⚠</div>
+      <div class="unavailable-title">Indisponível</div>
+      <div class="unavailable-text">
+        Esta extensão só pode ser utilizada dentro do SARP.
+      </div>
+    </div>
+
+    <!-- Conteúdo normal do Popup -->
+    <div id="mainContent">
+
+      <!-- Header -->
+      <header class="header">
+        <div class="brand">
+          <div class="logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+          </div>
+          <div>
+            <h1>Monitor SARP</h1>
+            <span class="version">v1.0.1</span>
+          </div>
+        </div>
+
+        <button id="btnOptions" class="icon-button" title="Configurações">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </header>
+
+      <!-- Main Switch -->
+      <div class="card status-card">
+        <div class="status-header">
+          <div>
+            <span class="label">Status do Monitor</span>
+            <div id="statusText" class="status-indicator">Ativo e Escaneando</div>
+          </div>
+
+          <label class="switch">
+            <input type="checkbox" id="toggleMonitoring" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="url-badge">
+          <span class="dot"></span>
+          <span id="currentDomain">google.com</span>
+        </div>
+      </div>
+
+      <!-- Quick Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-box">
+          <span class="stat-value" id="statElements">128</span>
+          <span class="stat-label">Elementos DOM</span>
+        </div>
+
+        <div class="stat-box">
+          <span class="stat-value" id="statAlerts">3</span>
+          <span class="stat-label">Eventos Hoje</span>
+        </div>
+
+        <div class="stat-box">
+          <span class="stat-value" id="statLatency">12ms</span>
+          <span class="stat-label">Latência</span>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="actions-section">
+        <button id="btnScanPage" class="btn btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          Inspecionar Página Agora
+        </button>
+
+        <div class="button-group">
+          <button id="btnSendPing" class="btn btn-secondary">
+            Enviar Ping
+          </button>
+
+          <button id="btnClearData" class="btn btn-secondary">
+            Limpar Cache
+          </button>
+        </div>
+      </div>
+
+      <!-- Log Console Mini -->
+      <div class="mini-console">
+        <div class="console-header">
+          <span>Últimas Atividades</span>
+          <span id="logCountBadge" class="badge">Pronto</span>
+        </div>
+
+        <div id="logList" class="console-logs">
+          <div class="log-item info">[10:45:12] Minitor Sarp inicializado</div>
+          <div class="log-item success">[10:45:14] Content script conectado à aba ativa</div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <span>Minitor Sarp • Extensão Google Chrome</span>
+      </footer>
+
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
