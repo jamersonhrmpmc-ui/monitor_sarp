@@ -22,12 +22,12 @@
 
 ### 🔄 Antes de programar
 
-`git pull`
+-`git pull`
 
 ### 📤 Fazer commit
 
-`git add .`
-`git commit -m "Descreva a alteração"`
-`git push`
+-`git add .`
+-`git commit -m "Descreva a alteração"`
+-`git push`
 
 >**Alerta:** Sempre execute `git pull` antes de começar a programar.
