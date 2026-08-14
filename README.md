@@ -19,3 +19,12 @@
 - `options/`: Página de configurações da extensão (`options.html`, `options.js`, `options.css`).
 - `popup/`: Interface gráfica (`popup.html`, `popup.css`, `popup.js`).
 - `manifest.json`: Manifesto V3 com declaração de permissões, scripts e popup.
+
+
+# Comandos GIT:
+-**Fazer antes de programar**
+-git pull
+-**Fazer commit**
+- git add .
+- git commit -m "Descreva a alteração"
+- git push
