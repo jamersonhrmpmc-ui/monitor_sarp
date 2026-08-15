@@ -9,6 +9,7 @@
   --success: #10b981;
   --border: #334155;
   --radius: 8px;
+  user-select: none;  
 }
 
 * {
@@ -117,7 +118,7 @@ body {
 }
 
 .status-indicator.paused {
-  color: #f59e0b;
+  color: #ff0000;
 }
 
 .url-badge {
@@ -187,7 +188,7 @@ input:checked + .slider:before {
 /* Stats Grid */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
 }
 
@@ -257,21 +258,8 @@ input:checked + .slider:before {
   background: var(--bg-card-hover);
 }
 
-/* Console logs */
-.mini-console {
-  background: #090d16;
-  border: 1px solid #1e293b;
-  border-radius: var(--radius);
-  padding: 8px;
-}
-
-.console-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-bottom: 6px;
+.btn-secondary:active {
+  scale: 0.96;
 }
 
 .badge {
@@ -281,24 +269,6 @@ input:checked + .slider:before {
   border-radius: 4px;
   font-size: 10px;
 }
-
-.console-logs {
-  font-family: monospace;
-  font-size: 11px;
-  max-height: 70px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.log-item {
-  line-height: 1.3;
-}
-
-.log-item.info { color: #94a3b8; }
-.log-item.success { color: #34d399; }
-.log-item.warn { color: #fbbf24; }
 
 /* Footer */
 .footer {
@@ -317,17 +287,18 @@ input:checked + .slider:before {
 
 /* Mensagem fora do SARP */
 .unavailable-message {
-  min-height: 180px;
+  min-height: 100px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
   gap: 8px;
+  user-select: none; 
 }
 
 .unavailable-icon {
-  font-size: 28px;
+  font-size: 48px;
   color: #f59e0b;
 }
 

@@ -2,14 +2,14 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Minitor Sarp - Configurações</title>
+  <title>Monitor SARP - Configurações</title>
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
   <div class="options-container">
     <header class="header">
       <div class="title-group">
-        <h1>Minitor Sarp</h1>
+        <h1>Monitor SARP</h1>
         <p>Painel de preferências e parâmetros de monitoramento</p>
       </div>
     </header>
@@ -20,28 +20,17 @@
         <h2>Monitoramento</h2>
         <div class="form-group">
           <label for="monitoringInterval">Intervalo de Verificação (segundos):</label>
-          <input type="number" id="monitoringInterval" min="5" max="3600" value="30">
-          <span class="hint">Frequência em que o background worker realiza checagens.</span>
+                                                            <!-- Mudar pra seletor de 30 em 30 -->
+          <input type="number" id="monitoringInterval" min="30" max="300" value="30" disabled>
+          <span class="hint">Frequência em que o Monitor realiza checagens de atualização dos chamados. Valores válidos: 30 a 300 segundos.</span>
         </div>
 
         <div class="form-group">
-          <label for="targetSelector">Seletor CSS padrão do DOM:</label>
-          <input type="text" id="targetSelector" value="body" placeholder=".item, #status, body">
-        </div>
-      </section>
+          <label for="targetSelector">Seletor do Tipo de chamados</label>
 
-      <!-- Seção 2: Notificações -->
-      <section class="section">
-        <h2>Notificações e Alertas</h2>
-        <div class="checkbox-group">
-          <label>
-            <input type="checkbox" id="autoNotify" checked>
-            Exibir notificações nativas do Chrome quando houver eventos
-          </label>
-          <label>
-            <input type="checkbox" id="soundEnabled">
-            Emitir alerta sonoro
-          </label>
+                                                <!-- Mudar pra seletor de tipos -->
+          <input type="text" id="targetSelector" value="TODOS" disabled>
+          <span class="hint">Tipo de chamados que será enviado a notificação (ex: SUPORTE).</span>
         </div>
       </section>
 

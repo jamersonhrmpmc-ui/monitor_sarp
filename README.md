@@ -2,7 +2,7 @@
 
 ## 🚀 Como instalar no Google Chrome
 
-1. **Baixe ou extraia** todos os arquivos desta pasta em um diretório no seu computador.
+1. **Baixe e extraia** todos os arquivos desta pasta em um diretório no seu computador.
 2. Abra o Google Chrome e digite na barra de endereços: `chrome://extensions/`
 3. No canto superior direito da página de extensões, ative a chave **"Modo do desenvolvedor"** (Developer Mode).
 4. Clique no botão **"Carregar sem compactação"** (Load unpacked) no canto superior esquerdo.

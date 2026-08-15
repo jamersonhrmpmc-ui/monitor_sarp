@@ -1,32 +1,18 @@
 // Monitor SARP - Content Script
 // Injetado na página web conforme regra do manifest.json
-
 console.log('[Monitor SARP] Content script ativo na página:', window.location.href);
+
+// Inicia Monitor HUD se estiver ativo
+chrome.storage.sync.get(['isActive'], (data) => {
+    const isActive = data.isActive !== false;
+
+    if (isActive) {
+        injectMonitorHUD();
+    }
+});
 
 // Escuta mensagens enviadas pelo Popup ou pelo Background
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  // if (request.action === 'SCAN_PAGE') {
-  //   const startTime = performance.now();
-  //   const allElements = document.querySelectorAll('*');
-  //   const images = document.querySelectorAll('img');
-  //   const forms = document.querySelectorAll('form');
-  //   const links = document.querySelectorAll('a');
-
-  //   const duration = Math.round(performance.now() - startTime);
-
-  //   // Responde ao popup com os dados coletados da página
-  //   sendResponse({
-  //     success: true,
-  //     elementCount: allElements.length,
-  //     imageCount: images.length,
-  //     formCount: forms.length,
-  //     linkCount: links.length,
-  //     url: window.location.href,
-  //     title: document.title,
-  //     durationMs: duration
-  //   });
-  // }
-
   if (request.action === 'TOGGLE_HUD') {
     if (request.isActive) {
       injectMonitorHUD();
@@ -34,7 +20,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       removeMonitorHUD();
     }
     sendResponse({ success: true });
-}
+  }
 
   return true;
 });
@@ -48,14 +34,14 @@ function injectMonitorHUD() {
   hud.innerHTML = `
     <div class="monitor-hud-content">
       <span class="monitor-pulse"></span>
-      <span class="monitor-text">Monitor SARP Ativo</span>
+      <span class="monitor-text"><b>Monitor SARP Ativo</b></span>
     </div>
   `;
   document.body.appendChild(hud);
 }
 
 function removeMonitorHUD() {
-  const hud = document.getElementById('minitor-sarp-hud');
+  const hud = document.getElementById('monitor-sarp-hud');
 
   if (hud) {
     hud.remove();

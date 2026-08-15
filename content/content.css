@@ -27,11 +27,15 @@
   background: #10b981;
   border-radius: 50%;
   box-shadow: 0 0 6px #10b981;
-  animation: monitorPulseAnim 2s infinite;
+  animation: monitorPulseAnim 1.5s infinite;
+}
+
+.monitor-text{
+  color: #5a7bf2;
 }
 
 @keyframes monitorPulseAnim {
   0% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(1.2); }
+  50% { opacity: 0.2; transform: scale(1.2); }
   100% { opacity: 1; transform: scale(1); }
 }
