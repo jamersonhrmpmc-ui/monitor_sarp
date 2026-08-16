@@ -11,40 +11,57 @@
 
 ---
 
-## 🤖 Configuração do Telegram (Notificações)
+## 🔔 Configuração do ntfy (Notificações)
 
-Para receber as notificações de novos chamados no Telegram, você precisa criar um bot e obter o **Token** e o **Chat ID**.
+Para receber as notificações de novos chamados no celular, o **Monitor SARP utiliza o ntfy**.
 
-### 1. Criar o Bot
+O ntfy é um serviço de notificações que permite receber mensagens diretamente no celular por meio de tópicos.
 
-1. Abra o Telegram e procure por **@BotFather** (oficial, com selo azul).
-2. Envie o comando `/start`.
-3. Envie o comando `/newbot`.
-4. Escolha um **nome** para o bot (ex: `Monitor SARP`).
-5. Escolha um **username** que termine com `bot` (ex: `monitor_sarp_bot`).  
-   > O username precisa ser único.
-6. O BotFather vai te enviar o **Token** do bot.  
-   Ele se parece com isto:  
-   `1234567890:AAHxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`  
-   **Guarde este token com cuidado** (não compartilhe publicamente).
+### 1. Instalar o ntfy
 
-### 2. Obter o Chat ID
+Instale o aplicativo **ntfy** no seu celular.
 
-1. Procure pelo bot que você acabou de criar e clique em **Iniciar** (ou envie qualquer mensagem, como `/start`).
-2. Abra o navegador e acesse o link abaixo (substitua `SEU_TOKEN` pelo token que você recebeu): **https://api.telegram.org/botSEU_TOKEN/getUpdates**
-3. No JSON que aparecer, procure pelo campo `"chat": { "id": 123456789 }`.  
-O número que estiver em `id` é o seu **Chat ID**.
+Depois de instalar, abra o aplicativo e permita as notificações quando solicitado.
 
-> **Dica rápida:** Você também pode usar o bot [@userinfobot](https://t.me/userinfobot) ou [@getmyid_bot](https://t.me/getmyid_bot) para descobrir seu Chat ID de forma mais simples.
+### 2. Criar um tópico
 
-### 3. Configurar na Extensão
+1. Acesse o ntfy pelo aplicativo ou pelo site.
+2. Crie um novo tópico para o Monitor SARP.
+3. Escolha um nome exclusivo para o tópico.
+
+> **Importante:** O nome do tópico deve ser exclusivo. Evite utilizar nomes fáceis de adivinhar.
+
+### 3. Copiar a URL do tópico
+
+Depois de criar o tópico, copie a **URL completa** dele.
+
+Ela terá um formato semelhante a:
+
+`https://ntfy.sh/seu-topico`
+
+Essa é a URL que será utilizada pela extensão para enviar as notificações.
+
+### 4. Configurar na Extensão
 
 1. Clique com o botão direito no ícone da extensão **Monitor SARP**.
 2. Selecione **Opções**.
-3. Cole o **Token** e o **Chat ID** nos campos correspondentes.
+3. No campo destinado às notificações, cole a **URL completa do seu tópico ntfy**.
 4. Salve as configurações.
 
-Pronto! A partir de agora as notificações de novos chamados serão enviadas para o seu Telegram.
+Pronto!
+
+A partir de agora, quando o Monitor SARP detectar novos chamados, as notificações serão enviadas automaticamente para o seu celular através do ntfy.
+
+### 📱 Configuração recomendada no celular
+
+Para garantir que as notificações sejam recebidas mesmo com a tela bloqueada:
+
+- Permita as notificações do ntfy.
+- Permita notificações na tela de bloqueio.
+- Permita vibração.
+- Permita notificações em segundo plano.
+- Ative o **Instant Delivery** no ntfy, caso esteja disponível no seu dispositivo.
+- No Android/MIUI, evite restringir o uso de bateria do ntfy em segundo plano.
 
 ---
 

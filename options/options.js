@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const monitoringInterval = document.getElementById('monitoringInterval');
   const targetSelector = document.getElementById('targetSelector');
   const tokentel = document.getElementById('tokentel');
-  const chatidtel = document.getElementById('chatidtel');
+  // const chatidtel = document.getElementById('chatidtel');
  
   const btnSave = document.getElementById('btnSave');
   const saveStatus = document.getElementById('saveStatus');
@@ -13,12 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     monitoringInterval: 30,
     targetSelector: 'TODOS',
     tokentel: '',
-    chatidtel: ''
   }, (items) => {
     monitoringInterval.value = items.monitoringInterval;
     targetSelector.value = items.targetSelector;
     tokentel.value = items.tokentel;
-    chatidtel.value = items.chatidtel;
   });
 
   // Salvar preferências
@@ -34,10 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
     monitoringInterval.value = intervalValue;
 
     const token = tokentel.value.trim();
-    const chatId = chatidtel.value.trim();
+    // const chatId = chatidtel.value.trim();
 
     // Validação: Token e Chat ID não podem estar vazios
-    if (!token || !chatId) {
+    if (!token){ // || !chatId) {
       saveStatus.textContent = 'Preencha o Token e o Chat ID do Telegram!';
       saveStatus.style.color = '#e74c3c';
       saveStatus.style.opacity = '1';
@@ -52,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
       monitoringInterval: intervalValue,
       targetSelector: targetSelector.value || 'TODOS',
       tokentel: token,
-      chatidtel: chatId
+      // chatidtel: chatId
     };
 
     chrome.storage.sync.set(config, () => {

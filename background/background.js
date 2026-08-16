@@ -45,10 +45,10 @@ chrome.runtime.onInstalled.addListener(
       ntodos: 0,
 
       nsuporte: 0,
-      
+
       tokentel: '',
 
-      chatidtel: ''
+      chatidtel: 'senha123'
 
     });
 
@@ -547,7 +547,7 @@ async function processarChamados(json) {
 
 }
 
-// ENVIA AS NOVAS NOTIFICAÇÕES PARA O TELEGRAM
+// ENVIA AS NOVAS NOTIFICAÇÕES PARA O ntfy
 async function notificarNovosChamados(chamados) {
 
   for (const chamado of chamados) {
@@ -558,30 +558,281 @@ async function notificarNovosChamados(chamados) {
     );
 
     const mensagem = `
-    🚨 NOVO CHAMADO SARP
+🚨 NOVO CHAMADO SARP
 
-    📋 Chamado: ${chamado.numero}
-    📌 Status: ${chamado.status}
-    🛠️ Serviço: ${chamado.servico}
-    🏢 Setor: ${chamado.setor}
-    ⚠️ Prioridade: ${chamado.prioridade}
-    📅 Data: ${chamado.criadoEm}
-
-    📝 Descrição:
-    ${chamado.descricao}
-    `.trim();
+📋 Chamado: ${chamado.numero}
+📌 Status: ${chamado.status}
+🛠️ Serviço: ${chamado.servico}
+🏢 Setor: ${chamado.setor}
+⚠️ Prioridade: ${chamado.prioridade}
+📅 Data: ${chamado.criadoEm}
+`.trim();
 
     console.log(
-      '[Monitor SARP] Mensagem Telegram:',
+      '[Monitor SARP] Mensagem ntfy:',
       mensagem
     );
 
-    // FUNÇÃO DE ENVIO TELEGRAM
-    // await enviarTelegram(mensagem);
+    // Pega das configurações da extensão
+    const {
+      tokentel: ntfyUrl,
+      chatidtel: chatId
+    } = await chrome.storage.sync.get([
+      'tokentel',
+      'chatidtel'
+    ]);
 
+    if (ntfyUrl && chatId) {
+
+      await enviarParaNtfy(
+        mensagem,
+        ntfyUrl
+      );
+
+    } else {
+
+      console.warn(
+        '[Monitor SARP] URL do ntfy ou Chat ID não configurados'
+      );
+
+    }
   }
-
 }
+
+
+// ENVIA A MENSAGEM PARA O ntfy
+async function enviarParaNtfy(mensagem, ntfyUrl) {
+
+  try {
+
+    const response = await fetch(ntfyUrl, {
+
+      method: 'POST',
+
+      headers: {
+        'Title': 'Monitor SARP',
+        'Priority': 'high'
+      },
+
+      body: mensagem
+
+    });
+
+    if (!response.ok) {
+
+      const data = await response.text();
+
+      console.error(
+        '[Monitor SARP] Erro ntfy:',
+        response.status,
+        data
+      );
+
+      return false;
+    }
+
+    console.log(
+      '[Monitor SARP] Mensagem enviada com sucesso para o ntfy'
+    );
+
+    return true;
+
+  } catch (error) {
+
+    console.error(
+      '[Monitor SARP] Falha ao enviar para o ntfy:',
+      error
+    );
+
+    return false;
+  }
+}
+
+// // TESTE: ENVIA TODOS OS CHAMADOS ABERTOS PARA O ntfy
+// async function testarNotificacaoNtfy() {
+
+//   console.log(
+//     '[Monitor SARP] ===== INÍCIO DO TESTE DE NOTIFICAÇÃO ====='
+//   );
+
+//   try {
+
+//     // CONSULTA O SARP REAL
+//     const resultado =
+//       await consultarChamados();
+
+//     // VERIFICA AUTENTICAÇÃO
+//     if (
+//       !resultado.logado
+//     ) {
+
+//       console.warn(
+//         '[Monitor SARP] Teste cancelado: usuário não está logado.',
+//         resultado.motivo || ''
+//       );
+
+//       return;
+//     }
+
+//     // PEGA OS REGISTROS DO JSON
+//     const registros =
+//       Array.isArray(
+//         resultado.json?.data
+//       )
+//         ? resultado.json.data
+//         : [];
+
+//     console.log(
+//       `[Monitor SARP] ${registros.length} registros recebidos no JSON.`
+//     );
+
+//     // FILTRA SOMENTE OS CHAMADOS ABERTOS
+//     const chamadosAbertos =
+//       registros.filter(
+//         chamado => {
+
+//           return String(
+//             chamado?.status?.name || ''
+//           )
+//             .trim()
+//             .toUpperCase() === 'ABERTO';
+
+//         }
+//       );
+
+//     console.log(
+//       `[Monitor SARP] ${chamadosAbertos.length} chamados ABERTOS encontrados para teste.`
+//     );
+
+//     // CONVERTE PARA O MESMO FORMATO
+//     // UTILIZADO PELO MONITOR REAL
+//     const chamados =
+//       chamadosAbertos.map(
+//         extrairDadosChamado
+//       );
+
+//     // VERIFICA SE EXISTEM CHAMADOS
+//     if (
+//       chamados.length === 0
+//     ) {
+
+//       console.log(
+//         '[Monitor SARP] Nenhum chamado aberto encontrado.'
+//       );
+
+//       return;
+//     }
+
+//     console.log(
+//       '[Monitor SARP] Chamados que serão enviados:',
+//       chamados
+//     );
+
+//     // ENVIA TODOS COMO SE FOSSEM NOVOS
+//     await notificarNovosChamados(
+//       chamados
+//     );
+
+//     console.log(
+//       '[Monitor SARP] ===== FIM DO TESTE DE NOTIFICAÇÃO ====='
+//     );
+
+//   } catch (erro) {
+
+//     console.error(
+//       '[Monitor SARP] Erro durante teste de notificação:',
+//       erro
+//     );
+
+//   }
+// }
+
+// globalThis.testarNotificacaoNtfy = testarNotificacaoNtfy;
+
+// // ENVIA AS NOVAS NOTIFICAÇÕES PARA O ntfy
+// async function notificarNovosChamados(chamados) {
+
+//   for (const chamado of chamados) {
+
+//     console.log(
+//       '[Monitor SARP] Enviando notificação:',
+//       chamado
+//     );
+
+//     const mensagem = `
+// 🚨 NOVO CHAMADO SARP
+
+// 📋 Chamado: ${chamado.numero}
+// 📌 Status: ${chamado.status}
+// 🛠️ Serviço: ${chamado.servico}
+// 🏢 Setor: ${chamado.setor}
+// ⚠️ Prioridade: ${chamado.prioridade}
+// 📅 Data: ${chamado.criadoEm}
+
+// 📝 Descrição:
+// ${chamado.descricao}
+// `.trim();
+
+//     console.log(
+//       '[Monitor SARP] Mensagem Telegram:',
+//       mensagem
+//     );
+
+//     // FUNÇÃO DE ENVIO ntfy
+//     // Pega das configurações da extensão
+//     const {
+//       tokentel: botToken,
+//       chatidtel: chatId
+//     } = await chrome.storage.sync.get([
+//       'tokentel',
+//       'chatidtel'
+//     ]);
+
+//     if (botToken && chatId) {
+//       //await enviarParaTelegram(mensagem, botToken, chatId);
+//     } else {
+//       console.warn('Token ou Chat ID não configurados');
+//     } 
+
+//   }
+// }
+
+  // ENVIA A MENSAGEM PARA O telegram
+  // async function enviarParaTelegram(mensagem, botToken, chatId) {
+  //   const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+  //   try {
+  //     const response = await fetch(url, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         chat_id: chatId,
+  //         text: mensagem,
+  //         // parse_mode: 'HTML', // descomente se quiser formatar com <b>, <i> etc.
+  //         // disable_web_page_preview: true,
+  //       }),
+  //     });
+
+  //     const data = await response.json();
+
+  //     if (!data.ok) {
+  //       console.error('Erro Telegram:', data);
+  //       // você pode mostrar notificação de erro na extensão
+  //       return false;
+  //     }
+
+  //     console.log('Mensagem enviada com sucesso');
+  //     return true;
+  //   } catch (error) {
+  //     console.error('Falha ao enviar:', error);
+  //     return false;
+  //   }
+  // }
+
+  //funcao de teste
+  // globalThis.testarTelegram = testarTelegram;
 
 // EXTRAÇÃO DOS DADOS IMPORTANTES
 function extrairDadosChamado(c) {
