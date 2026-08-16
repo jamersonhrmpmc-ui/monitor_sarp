@@ -1,7 +1,9 @@
-// Minitor SARP - Options Controller
+// Monitor SARP - Options Controller
 document.addEventListener('DOMContentLoaded', () => {
   const monitoringInterval = document.getElementById('monitoringInterval');
   const targetSelector = document.getElementById('targetSelector');
+  const tokentel = document.getElementById('tokentel');
+  const chatidtel = document.getElementById('chatidtel');
  
   const btnSave = document.getElementById('btnSave');
   const saveStatus = document.getElementById('saveStatus');
@@ -9,10 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Carregar preferências salvas
   chrome.storage.sync.get({
     monitoringInterval: 30,
-    targetSelector: 'TODOS'
+    targetSelector: 'TODOS',
+    tokentel: '',
+    chatidtel: ''
   }, (items) => {
     monitoringInterval.value = items.monitoringInterval;
     targetSelector.value = items.targetSelector;
+    tokentel.value = items.tokentel;
+    chatidtel.value = items.chatidtel;
   });
 
   // Salvar preferências
@@ -27,18 +33,36 @@ document.addEventListener('DOMContentLoaded', () => {
     // Atualiza o campo na tela para o usuário ver a correção
     monitoringInterval.value = intervalValue;
 
+    const token = tokentel.value.trim();
+    const chatId = chatidtel.value.trim();
+
+    // Validação: Token e Chat ID não podem estar vazios
+    if (!token || !chatId) {
+      saveStatus.textContent = 'Preencha o Token e o Chat ID do Telegram!';
+      saveStatus.style.color = '#e74c3c';
+      saveStatus.style.opacity = '1';
+      setTimeout(() => {
+        saveStatus.style.opacity = '0';
+        saveStatus.style.color = ''; // volta a cor original
+      }, 3000);
+      return;
+    }
+
     const config = {
       monitoringInterval: intervalValue,
       targetSelector: targetSelector.value || 'TODOS',
+      tokentel: token,
+      chatidtel: chatId
     };
 
     chrome.storage.sync.set(config, () => {
       saveStatus.textContent = 'Preferências salvas com sucesso!';
+      saveStatus.style.color = '#2ecc71'; // verde (opcional)
       saveStatus.style.opacity = '1';
       setTimeout(() => {
         saveStatus.style.opacity = '0';
+        saveStatus.style.color = '';
       }, 2500);
     });
   });
-
 });

@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const currentDomain = document.getElementById('currentDomain');
   const btnClearData = document.getElementById('btnClearData');
 
+  const ntodos = document.getElementById('tdoabertos');
+
   // Verifica se a aba atual é o SARP
   const unavailableMessage = document.getElementById('unavailableMessage');
   const mainContent = document.getElementById('mainContent');
@@ -41,13 +43,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Carregar estado salvo via chrome.storage.sync
-  chrome.storage.sync.get(['isActive'], (data) => {
+  chrome.storage.sync.get(['isActive', 'ntodos'], (data) => {
     const isActive = data.isActive !== false;
     toggleMonitoring.checked = isActive;
     updateStatusUI(isActive);
-    // if (data.alertCount !== undefined) {
-    //   statAlerts.textContent = data.alertCount;
-    // }
+    if (data.ntodos !== undefined) {
+      ntodos.textContent = data.ntodos;
+    }
   });
 
   // Atualizar indicador visual de status

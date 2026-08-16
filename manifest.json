@@ -12,7 +12,8 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://sarp.saude.rn.gov.br/*"
+    "https://sarp.saude.rn.gov.br/*",
+    "https://api.telegram.org/*"
   ],
   "action": {
     "default_popup": "popup/popup.html",

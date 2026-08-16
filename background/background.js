@@ -1,91 +1,1060 @@
 // Monitor SARP - Background Service Worker (Manifest V3)
+
 console.log('[Monitor SARP] Background Service Worker inicializado.');
 
-// Evento disparado na instalação ou atualização da extensão
-chrome.runtime.onInstalled.addListener((details) => {
-  console.log('[Monitor SARP] Extensão instalada/atualizada:', details.reason);
+const ENDPOINT = 'https://sarp.saude.rn.gov.br/ti/chamados/getChamados';
 
-  // Inicializa o armazenamento padrão
-  chrome.storage.sync.set({
-    isActive: false,
-    monitoringInterval: 30,
-    targetSelector: 'TODOS'
+const ALARM_NAME = 'monitorSarpPulse';
+
+// RESTAURAR BADGE (TAG ON / OFF)
+async function restoreBadge() {
+
+  const { isActive = false } =
+    await chrome.storage.sync.get('isActive');
+
+  chrome.action.setBadgeText({
+    text: isActive ? 'ON' : 'OFF'
   });
 
-  // Define o badge inicial no ícone da extensão
-  chrome.action.setBadgeText({ text: 'OFF' });
-  chrome.action.setBadgeBackgroundColor({ color: '#64748b' });
+  chrome.action.setBadgeBackgroundColor({
+    color: isActive
+      ? '#0284c7'
+      : '#64748b'
+  });
+}
+restoreBadge();
 
-  // Cria um alarme de pulso periódico para checagem em segundo plano
-  chrome.alarms.create('monitorSarpPulse', { periodInMinutes: 0.5 });
-});
+// EXTENSÃO INSTALADA / ATUALIZADA
+chrome.runtime.onInstalled.addListener(
+  (details) => {
 
-// Listener para alarmes periódicos do Chrome
-chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === 'monitorSarpPulse') {
-    chrome.storage.sync.get(['isActive'], (data) => {
-      if (data.isActive !== false) {
-        console.log('[Monitor SARP] Pulso de monitoramento executado com sucesso.');
-      }
+    console.log(
+      '[Monitor SARP] Extensão instalada/atualizada:',
+      details.reason
+    );
 
-      // Comandos executados a cada 30 segundos.
+    // Sempre começa OFF.
+    chrome.storage.sync.set({
 
+      isActive: false,
 
+      monitoringInterval: 30,
 
+      targetSelector: 'TODOS',
 
+      ntodos: 0,
 
+      nsuporte: 0,
+      
+      tokentel: '',
+
+      chatidtel: ''
 
     });
+
+    // Limpa referência anterior dos chamados.
+    chrome.storage.local.remove([
+      'sarpMonitor'
+    ]);
+
+    // Badge inicial.
+    chrome.action.setBadgeText({
+      text: 'OFF'
+    });
+
+    chrome.action.setBadgeBackgroundColor({
+      color: '#64748b'
+    });
+
+    // Cria o alarme de 30 segundos.
+    chrome.alarms.create(
+      ALARM_NAME,
+      {
+        periodInMinutes: 0.5
+      }
+    );
+
+    console.log(
+      '[Monitor SARP] Alarme criado.'
+    );
+
   }
-});
+);
 
-// Listener central de mensagens (comunicação entre Popup, Content Scripts e Background)
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('[Monitor SARP] Mensagem recebida:', request.action, request);
+// FUNÇÃO PRINCIPAL DO MONITOR
+async function executarMonitoramento() {
 
-  switch (request.action) {
-    // case 'PING':
-    //   sendResponse({ message: 'PONG_FROM_BACKGROUND', timestamp: Date.now() });
-    //   break;
+  console.log(
+    '[Monitor SARP] Executando monitoramento...'
+  );
 
-    case 'TOGGLE_MONITORING':
-      const isActive = request.payload?.isActive;
-      chrome.action.setBadgeText({ text: isActive ? 'ON' : 'OFF' });
-      chrome.action.setBadgeBackgroundColor({ color: isActive ? '#0284c7' : '#64748b' });
-      //Envia o estado para o Content Script da aba ativa
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs[0]?.id) {
-          chrome.tabs.sendMessage(tabs[0].id, {
-            action: 'TOGGLE_HUD',
-            isActive
-          });
-        }
+  // VERIFICA SE O MONITOR ESTÁ ATIVO
+  const config =
+    await chrome.storage.sync.get([
+      'isActive'
+    ]);
+
+  if (
+    config.isActive !== true
+  ) {
+
+    console.log(
+      '[Monitor SARP] Monitor está OFF.'
+    );
+
+    return;
+  }
+
+  // PROCURA QUALQUER ABA DO SARP
+  const abas =
+    await chrome.tabs.query({
+      url: 'https://sarp.saude.rn.gov.br/*'
+    });
+
+  const abaSarp =
+    abas[0];
+
+  // NÃO EXISTE ABA DO SARP
+  if (!abaSarp?.id) {
+
+    console.log(
+      '[Monitor SARP] Nenhuma aba do SARP encontrada.'
+    );
+
+    return;
+  }
+
+  console.log(
+    '[Monitor SARP] Aba SARP encontrada:',
+    abaSarp.id,
+    abaSarp.url
+  );
+
+  // SE EXISTE ABA DO SARP
+  // A AUTENTICAÇÃO SERÁ VERIFICADA PELO getChamados().
+  try {
+
+    const resultado =
+      await consultarChamados();
+
+    // USUÁRIO NÃO ESTÁ LOGADO
+    if (
+      !resultado.logado
+    ) {
+
+      console.log(
+        '[Monitor SARP] Usuário não está logado no SARP.',
+        resultado.motivo || ''
+      );
+
+      chrome.action.setBadgeText({
+        text: 'Auth'
       });
 
-      sendResponse({ success: true, isActive });
-    break;
+      chrome.action.setBadgeBackgroundColor({
+        color: '#dc2626'
+      });
 
-    // case 'LOG_EVENT':
-    //   // Incrementa o contador de alertas
-    //   chrome.storage.sync.get(['alertCount', 'autoNotify'], (data) => {
-    //     const newCount = (data.alertCount || 0) + 1;
-    //     chrome.storage.sync.set({ alertCount: newCount });
+      return;
+    }
 
-    //     if (data.autoNotify) {
-    //       chrome.notifications.create({
-    //         type: 'basic',
-    //         iconUrl: '../icons/icon48.png',
-    //         title: 'Minitor Sarp - Alerta',
-    //         message: request.payload?.message || 'Evento detectado na página!'
-    //       });
-    //     }
-    //   });
-    //   sendResponse({ received: true });
-    //   break;
+    // USUÁRIO ESTÁ LOGADO
+    chrome.action.setBadgeText({
+      text: 'ON'
+    });
 
-    default:
-      sendResponse({ status: 'unknown_action' });
+    chrome.action.setBadgeBackgroundColor({
+      color: '#0284c7'
+    });
+
+    // PROCESSA OS CHAMADOS
+    await processarChamados(
+      resultado.json
+    );
+
+
+  } catch (erro) {
+
+    console.error(
+      '[Monitor SARP] Erro durante monitoramento:',
+      erro
+    );
+
+    chrome.action.setBadgeText({
+      text: 'ERRO'
+    });
+
+    chrome.action.setBadgeBackgroundColor({
+      color: '#f59e0b'
+    });
+
   }
 
-  return true; // Permite resposta assíncrona
-});
+}
+
+// CONSULTA AO SARP
+async function consultarChamados() {
+  const url =
+    ENDPOINT +
+    '?draw=1' +
+    '&start=0' +
+    '&length=20' +
+    '&columns[0][data]=' +
+    '&columns[0][name]=numero' +
+    '&columns[0][searchable]=true' +
+    '&columns[0][orderable]=false' +
+    '&columns[0][search][value]=' +
+    '&columns[0][search][regex]=false' +
+    '&columns[1][data]=' +
+    '&columns[1][name]=status' +
+    '&columns[1][searchable]=true' +
+    '&columns[1][orderable]=false' +
+    '&columns[1][search][value]=ABERTO' +
+    '&columns[1][search][regex]=false' +
+    '&search[value]=' +
+    '&search[regex]=false' +
+    '&_=' +
+    Date.now();
+
+  console.log(
+    '[Monitor SARP] Consultando:',
+    url
+  );
+
+  const response =
+    await fetch(
+      url,
+      {
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store',
+        headers: {
+          'Accept':
+            'application/json, text/javascript, */*; q=0.01',
+
+          'X-Requested-With':
+            'XMLHttpRequest'
+
+        }
+
+      }
+    );
+
+  // HTTP 401
+  if (
+    response.status === 401
+  ) {
+
+    console.log(
+      '[Monitor SARP] HTTP 401: sessão do SARP não autenticada.'
+    );
+
+    return {
+
+      logado: false,
+      json: null,
+      motivo: '401'
+
+    };
+  }
+
+  // HTTP 403
+  if (
+    response.status === 403
+  ) {
+
+    console.log(
+      '[Monitor SARP] HTTP 403: acesso negado pelo SARP.'
+    );
+
+    return {
+
+      logado: false,
+      json: null,
+      motivo: '403'
+
+    };
+  }
+
+  // OUTROS ERROS HTTP
+  if (
+    !response.ok
+  ) {
+
+    throw new Error(
+      `HTTP ${response.status}`
+    );
+
+  }
+
+  // LÊ A RESPOSTA
+  const contentType =
+    response.headers.get(
+      'content-type'
+    ) || '';
+
+
+  const texto =
+    await response.text();
+
+  // SERVIDOR RETORNOU HTML
+  // Pode acontecer quando o SARP manda para a tela de login.
+  if (
+
+    contentType.includes(
+      'text/html'
+    ) ||
+
+    texto
+      .trim()
+      .startsWith(
+        '<!DOCTYPE'
+      ) ||
+
+    texto
+      .trim()
+      .startsWith(
+        '<html'
+      )
+
+  ) {
+
+    console.log(
+      '[Monitor SARP] Servidor retornou HTML. Sessão provavelmente não autenticada.'
+    );
+
+    return {
+
+      logado: false,
+      json: null,
+      motivo: 'html'
+
+    };
+
+  }
+
+  // TENTA CONVERTER PARA JSON
+  let json;
+  try {
+
+    json =
+      JSON.parse(
+        texto
+      );
+
+  } catch (erro) {
+
+    console.error(
+      '[Monitor SARP] Resposta não é JSON:',
+      texto.substring(
+        0,
+        300
+      )
+    );
+
+    return {
+
+      logado: false,
+      json: null,
+      motivo: 'json_invalido'
+
+    };
+
+  }
+
+  // CONFIRMA ESTRUTURA ESPERADA
+  if (
+
+    !json ||
+
+    !Array.isArray(
+      json.data
+    )
+
+  ) {
+
+    console.log(
+      '[Monitor SARP] JSON recebido não possui data[].'
+    );
+
+    return {
+
+      logado: false,
+      json: null,
+      motivo: 'estrutura_invalida'
+
+    };
+
+  }
+
+  // LOGIN CONFIRMADO
+  console.log(
+    '[Monitor SARP] Sessão autenticada. JSON recebido corretamente.'
+  );
+
+  return {
+
+    logado: true,
+    json,
+    motivo: null
+
+  };
+
+}
+
+// PROCESSAMENTO DOS CHAMADOS
+async function processarChamados(json) {
+
+  const registros =
+    Array.isArray(
+      json.data
+    )
+      ? json.data
+      : [];
+
+
+  // Extrai somente os chamados ABERTOS.
+  const chamadosAbertos =
+    registros.filter(
+      chamado => {
+
+        return String(
+
+          chamado?.status?.name || ''
+
+        )
+          .trim()
+          .toUpperCase() === 'ABERTO';
+
+      }
+    );
+
+  chrome.storage.sync.set({ ntodos: chamadosAbertos.length });
+  console.log(
+    `[Monitor SARP] ${chamadosAbertos.length} chamados abertos encontrados.`
+  );
+
+  // Converte para o formato organizado.
+  const chamados =
+    chamadosAbertos.map(
+      extrairDadosChamado
+    );
+
+  // IDs da consulta atual.
+  const idsAtuais =
+    chamados.map(
+      chamado => chamado.id
+    );
+
+  // Recupera referência anterior.
+  const storage =
+    await chrome.storage.local.get([
+      'sarpMonitor'
+    ]);
+
+  const monitorAnterior =
+    storage.sarpMonitor;
+
+  // PRIMEIRA CONSULTA
+  if (
+    !monitorAnterior
+  ) {
+
+    console.log(
+      '[Monitor SARP] Primeira consulta.'
+    );
+
+    console.log(
+      '[Monitor SARP] Criando referência inicial.'
+    );
+
+    await salvarMonitor(
+
+      json,
+      chamados,
+      idsAtuais,
+      []
+
+    );
+
+    return;
+  }
+
+  // COMPARAÇÃO
+  const idsAnteriores =
+
+    Array.isArray(
+      monitorAnterior.idsAbertos
+    )
+
+      ? monitorAnterior.idsAbertos
+
+      : [];
+
+
+  const novosChamados =
+    chamados.filter(
+      chamado => {
+
+        return !idsAnteriores.includes(
+          chamado.id
+        );
+
+      }
+    );
+
+  // MOSTRA RESULTADO DA COMPARAÇÃO
+  if (
+    novosChamados.length > 0
+  ) {
+
+    console.log(
+      `[Monitor SARP] ${novosChamados.length} NOVO(S) CHAMADO(S)!`
+    );
+
+    await notificarNovosChamados(novosChamados);
+
+    novosChamados.forEach(
+      chamado => {
+
+        console.log(
+          '[NOVO CHAMADO]',
+          chamado
+        );
+
+      }
+    );
+
+
+  } else {
+
+    console.log(
+      '[Monitor SARP] Nenhum chamado novo.'
+    );
+
+  }
+
+
+  // Salva consulta atual.
+  await salvarMonitor(
+
+    json,
+    chamados,
+    idsAtuais,
+    novosChamados
+
+  );
+
+}
+
+// ENVIA AS NOVAS NOTIFICAÇÕES PARA O TELEGRAM
+async function notificarNovosChamados(chamados) {
+
+  for (const chamado of chamados) {
+
+    console.log(
+      '[Monitor SARP] Enviando notificação:',
+      chamado
+    );
+
+    const mensagem = `
+    🚨 NOVO CHAMADO SARP
+
+    📋 Chamado: ${chamado.numero}
+    📌 Status: ${chamado.status}
+    🛠️ Serviço: ${chamado.servico}
+    🏢 Setor: ${chamado.setor}
+    ⚠️ Prioridade: ${chamado.prioridade}
+    📅 Data: ${chamado.criadoEm}
+
+    📝 Descrição:
+    ${chamado.descricao}
+    `.trim();
+
+    console.log(
+      '[Monitor SARP] Mensagem Telegram:',
+      mensagem
+    );
+
+    // FUNÇÃO DE ENVIO TELEGRAM
+    // await enviarTelegram(mensagem);
+
+  }
+
+}
+
+// EXTRAÇÃO DOS DADOS IMPORTANTES
+function extrairDadosChamado(c) {
+
+  const dados = {
+
+    // IDENTIFICAÇÃO
+    id:
+      c?.id ?? null,
+
+    numero:
+      c?.numero ?? null,
+
+
+    // STATUS
+    statusId:
+      c?.status_id ?? null,
+
+    status:
+      c?.status?.name ?? null,
+
+
+    // DATAS
+    criadoEm:
+      c?.created_at ?? null,
+
+    atualizadoEm:
+      c?.updated_at ?? null,
+
+    fechadoEm:
+      c?.data_fechamento ?? null,
+
+
+    // TIPO
+    tipoId:
+      c?.tipo_id ?? null,
+
+    tipo:
+      c?.tipo?.name ?? null,
+
+
+    // SERVIÇO
+    servicoId:
+      c?.servico_id ?? null,
+
+    servico:
+      c?.servico?.name ?? null,
+
+    tipoSolicitacao:
+      c?.servico?.tipo_solicitacao ?? null,
+
+
+    // CATEGORIA
+    categoriaId:
+      c?.servico?.categoria_id ?? null,
+
+    categoria:
+      c?.servico?.categoria?.name ?? null,
+
+
+    // INSTÂNCIA
+    instanciaId:
+      c?.servico?.categoria?.instancia_id ?? null,
+
+    instancia:
+      c?.servico?.categoria?.instancia?.name ?? null,
+
+
+    // SISTEMA
+    nomeSistema:
+      c?.nome_sistema ?? null,
+
+
+    // LOCAL
+    localId:
+      c?.local_id ?? null,
+
+    setorId:
+      c?.local?.setor_id ?? null,
+
+    setorSigla:
+      c?.local?.setor?.sigla ?? null,
+
+    setor:
+      c?.local?.setor?.name ?? null,
+
+
+    // COORDENAÇÃO
+    coordenacaoId:
+      c?.local?.setor?.coordenacao?.id ?? null,
+
+    coordenacao:
+      c?.local?.setor?.coordenacao?.name ?? null,
+
+    coordenacaoSigla:
+      c?.local?.setor?.coordenacao?.sigla ?? null,
+
+
+    // UNIDADE
+    unidadeId:
+      c?.local?.setor?.coordenacao?.unidade?.id ?? null,
+
+    unidade:
+      c?.local?.setor?.coordenacao?.unidade?.name ?? null,
+
+    unidadeSigla:
+      c?.local?.setor?.coordenacao?.unidade?.sigla ?? null,
+
+    cidade:
+      c?.local?.setor?.coordenacao?.unidade?.cidade ?? null,
+
+
+    // PRIORIDADE
+    prioridadeId:
+      c?.sla?.prioridade_id ?? null,
+
+    prioridade:
+      c?.sla?.prioridade?.name ?? null,
+
+
+    // SLA
+    slaId:
+      c?.sla?.id ?? null,
+
+    slaNivel:
+      c?.sla?.nivel_id ?? null,
+
+    slaTempoResposta:
+      c?.sla?.tempo_resposta ?? null,
+
+    slaPrazoSolucao:
+      c?.sla?.prazo_solucao ?? null,
+
+    slaDataLimiteResposta:
+      c?.sla?.data_limite_resposta ?? null,
+
+    slaDataLimiteSolucao:
+      c?.sla?.data_limite_solucao ?? null,
+
+
+    // DESCRIÇÃO
+    descricao:
+      c?.descricao ?? null
+
+  };
+
+
+  return dados;
+}
+
+// SALVAR DADOS NO STORAGE
+async function salvarMonitor(
+
+  json,
+  chamados,
+  idsAtuais,
+  novosChamados
+
+) {
+
+  const dadosParaSalvar = {
+
+    // Quantidade total no SARP
+    recordsTotal:
+      json?.recordsTotal ?? null,
+
+
+    // Quantidade encontrada pelo filtro ABERTO
+    recordsFiltered:
+      json?.recordsFiltered ?? null,
+
+
+    // IDs dos chamados abertos
+    idsAbertos:
+      idsAtuais,
+
+
+    // Todos os chamados abertos
+    chamados:
+      chamados,
+
+
+    // Novos encontrados nessa consulta
+    novosChamados:
+      novosChamados,
+
+
+    // Momento da consulta
+    ultimaConsulta:
+      new Date().toISOString()
+
+  };
+
+
+  await chrome.storage.local.set({
+
+    sarpMonitor:
+      dadosParaSalvar
+
+  });
+
+
+  console.log(
+    '[Monitor SARP] Dados salvos no storage.'
+  );
+
+}
+
+// ALARME
+chrome.alarms.onAlarm.addListener(
+  async (alarm) => {
+
+    if (
+      alarm.name !== ALARM_NAME
+    ) {
+      return;
+    }
+
+
+    console.log(
+      '[Monitor SARP] Pulso de monitoramento.'
+    );
+
+
+    await executarMonitoramento();
+
+  }
+);
+
+// ATIVA / DESATIVA MONITORAMENTO
+chrome.runtime.onMessage.addListener(
+
+  (
+    request,
+    sender,
+    sendResponse
+  ) => {
+
+    console.log(
+      '[Monitor SARP] Mensagem recebida:',
+      request.action,
+      request
+    );
+
+
+    switch (
+      request.action
+    ) {
+
+      // TOGGLE
+      case 'TOGGLE_MONITORING': {
+
+        const isActive =
+          request.payload?.isActive === true;
+
+
+        chrome.storage.sync.set({
+
+          isActive
+
+        });
+
+
+        chrome.action.setBadgeText({
+
+          text:
+            isActive
+              ? 'ON'
+              : 'OFF'
+
+        });
+
+
+        chrome.action.setBadgeBackgroundColor({
+
+          color:
+            isActive
+              ? '#0284c7'
+              : '#64748b'
+
+        });
+
+
+        // SE ACABOU DE ATIVAR,
+        // FAZ PRIMEIRA CONSULTA IMEDIATAMENTE
+        if (
+          isActive
+        ) {
+
+          executarMonitoramento();
+
+        }
+
+        // ATUALIZA HUD DA PÁGINA
+        chrome.tabs.query(
+
+          {
+            active: true,
+            currentWindow: true
+          },
+
+          (tabs) => {
+
+            if (
+              tabs[0]?.id
+            ) {
+
+              chrome.tabs.sendMessage(
+
+                tabs[0].id,
+
+                {
+                  action: 'TOGGLE_HUD',
+                  isActive
+                }
+
+              ).catch(
+                () => {}
+              );
+
+            }
+
+          }
+
+        );
+
+
+        sendResponse({
+
+          success: true,
+
+          isActive
+
+        });
+
+
+        break;
+
+      }
+
+      // DEFAULT
+
+      default:
+
+        sendResponse({
+
+          status:
+            'unknown_action'
+
+        });
+
+    }
+
+
+    return true;
+
+  }
+
+);
+
+// QUANDO UMA ABA É ATIVADA
+chrome.tabs.onActivated.addListener(
+
+  async (activeInfo) => {
+
+    const config =
+      await chrome.storage.sync.get([
+        'isActive'
+      ]);
+
+
+    if (
+      config.isActive !== true
+    ) {
+      return;
+    }
+
+
+    try {
+
+      const tab =
+        await chrome.tabs.get(
+          activeInfo.tabId
+        );
+
+
+      // SÓ NOS IMPORTAMOS COM O DOMÍNIO DO SARP
+      if (
+
+        tab.url &&
+
+        tab.url.startsWith(
+          'https://sarp.saude.rn.gov.br/'
+        )
+
+      ) {
+
+        console.log(
+          '[Monitor SARP] Aba SARP ativada. Consultando...'
+        );
+
+
+        await executarMonitoramento();
+
+      }
+
+
+    } catch (erro) {
+
+      console.error(
+
+        '[Monitor SARP] Erro ao verificar aba:',
+
+        erro
+
+      );
+
+    }
+
+  }
+
+);
+
+// QUANDO UMA ABA TERMINA DE CARREGAR
+chrome.tabs.onUpdated.addListener(
+
+  async (
+    tabId,
+    changeInfo,
+    tab
+  ) => {
+
+    if (
+      changeInfo.status !== 'complete'
+    ) {
+      return;
+    }
+
+    // SÓ NOS IMPORTAMOS COM O DOMÍNIO DO SARP
+    if (
+
+      !tab.url ||
+
+      !tab.url.startsWith(
+        'https://sarp.saude.rn.gov.br/'
+      )
+
+    ) {
+
+      return;
+    }
+
+
+    const config =
+      await chrome.storage.sync.get([
+        'isActive'
+      ]);
+
+
+    if (
+      config.isActive !== true
+    ) {
+      return;
+    }
+
+
+    console.log(
+      '[Monitor SARP] Página SARP carregada. Consultando...'
+    );
+
+
+    await executarMonitoramento();
+
+  }
+
+);
