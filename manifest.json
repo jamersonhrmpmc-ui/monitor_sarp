@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Monitor SARP",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Extensão para monitoramento e notificação no SARP-SAÚDE-RN",
+  "author": "Jamerson J. Silva",
   "permissions": [
     "storage",
     "activeTab",
@@ -13,7 +14,7 @@
   ],
   "host_permissions": [
     "https://sarp.saude.rn.gov.br/*",
-    "https://api.telegram.org/*"
+    "https://ntfy.sh/*"
   ],
   "action": {
     "default_popup": "popup/popup.html",

@@ -9,7 +9,7 @@
   --success: #10b981;
   --border: #334155;
   --radius: 8px;
-  user-select: none;  
+  user-select: none;
 }
 
 * {
@@ -38,6 +38,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+/* NOVO: agrupa os botões de Ajuda e Configurações */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
 .brand {
@@ -294,7 +301,7 @@ input:checked + .slider:before {
   justify-content: center;
   text-align: center;
   gap: 8px;
-  user-select: none; 
+  user-select: none;
 }
 
 .unavailable-icon {
