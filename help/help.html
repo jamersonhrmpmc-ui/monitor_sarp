@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Monitor SARP — Ajuda</title>
-
     <link rel="stylesheet" href="help.css">
 </head>
 
@@ -13,35 +11,24 @@
 
     <header class="header">
         <div class="header-content">
-
             <div class="brand">
                 <div class="brand-icon">MS</div>
-
                 <div>
                     <h1>Monitor SARP</h1>
                     <p>Central de ajuda</p>
                 </div>
             </div>
-
             <div class="version">
-                v1.0.1
+                v1.0.2
             </div>
-
         </div>
     </header>
 
 
     <div class="layout">
-
         <!-- MENU LATERAL -->
         <aside class="sidebar">
-
             <nav>
-
-                <a href="#instalacao">
-                    🚀 Como instalar
-                </a>
-
                 <a href="#ntfy">
                     🔔 Configuração do ntfy
                 </a>
@@ -49,135 +36,65 @@
                 <a href="#celular">
                     📱 Configuração no celular
                 </a>
-
-                <a href="#estrutura">
-                    📂 Estrutura de arquivos
-                </a>
-
-                <a href="#git">
-                    🔧 Comandos Git
-                </a>
-
             </nav>
-
         </aside>
-
 
         <!-- CONTEÚDO -->
         <main class="content">
 
-
-            <!-- INSTALAÇÃO -->
-            <section id="instalacao" class="section">
-
-                <span class="section-label">PRIMEIROS PASSOS</span>
-
-                <h2>🚀 Como instalar no Google Chrome</h2>
-
-                <ol>
-
-                    <li>
-                        <strong>Baixe e extraia</strong> todos os arquivos desta pasta
-                        em um diretório no seu computador.
-                    </li>
-
-                    <li>
-                        Abra o Google Chrome e digite na barra de endereços:
-                        <code>chrome://extensions/</code>
-                    </li>
-
-                    <li>
-                        No canto superior direito da página de extensões,
-                        ative a chave <strong>"Modo do desenvolvedor"</strong>
-                        (Developer Mode).
-                    </li>
-
-                    <li>
-                        Clique no botão
-                        <strong>"Carregar sem compactação"</strong>
-                        (Load unpacked) no canto superior esquerdo.
-                    </li>
-
-                    <li>
-                        Selecione a pasta onde estão os arquivos
-                        (a pasta que contém o arquivo
-                        <code>manifest.json</code>).
-                    </li>
-
-                    <li>
-                        <strong>Pronto!</strong> O ícone do
-                        <strong>Monitor SARP</strong> aparecerá na barra
-                        de ferramentas do seu navegador.
-                        Fixe-o para acessar o popup com facilidade.
-                    </li>
-
-                </ol>
-
-            </section>
-
-
             <!-- NTFY -->
             <section id="ntfy" class="section">
-
                 <span class="section-label">NOTIFICAÇÕES</span>
-
                 <h2>🔔 Configuração do ntfy</h2>
-
                 <p>
-                    Para receber as notificações de novos chamados no celular,
-                    o <strong>Monitor SARP utiliza o ntfy</strong>.
+                    O <strong>Monitor SARP utiliza o ntfy</strong> para enviar
+                    notificações de novos chamados diretamente para o seu celular.
                 </p>
 
                 <p>
-                    O ntfy é um serviço de notificações que permite receber
-                    mensagens diretamente no celular por meio de tópicos.
+                    A configuração é simples. Você precisa instalar o aplicativo
+                    ntfy, criar um tópico e informar a URL desse tópico nas
+                    configurações da extensão.
                 </p>
 
-
-                <h3>1. Instalar o ntfy</h3>
+                <h3>1. Instale o ntfy no celular</h3>
 
                 <p>
-                    Instale o aplicativo <strong>ntfy</strong> no seu celular.
+                    Primeiro, instale o aplicativo <strong>ntfy</strong> no seu
+                    celular.
                 </p>
 
                 <p>
-                    Depois de instalar, abra o aplicativo e permita as
-                    notificações quando solicitado.
+                    Depois de instalar, abra o aplicativo e permita que ele
+                    envie notificações.
                 </p>
 
+                <h3>2. Crie um tópico</h3>
 
-                <h3>2. Criar um tópico</h3>
-
-                <ol>
-
-                    <li>
-                        Acesse o ntfy pelo aplicativo ou pelo site.
-                    </li>
-
-                    <li>
-                        Crie um novo tópico para o Monitor SARP.
-                    </li>
-
-                    <li>
-                        Escolha um nome exclusivo para o tópico.
-                    </li>
-
-                </ol>
-
+                <p>
+                    No aplicativo ntfy, crie um novo tópico para receber as
+                    notificações do Monitor SARP.
+                </p>
 
                 <div class="alert alert-warning">
 
-                    <strong>⚠️ Importante</strong>
+                    <strong>⚠️ Escolha um nome difícil de adivinhar</strong>
 
                     <p>
-                        O nome do tópico deve ser exclusivo.
-                        Evite utilizar nomes fáceis de adivinhar.
+                        O tópico funciona como um endereço para suas notificações.
+                        Por isso, evite nomes simples como
+                        <code>sarp</code>, <code>monitor</code> ou
+                        <code>notificacao</code>.
+                    </p>
+
+                    <p>
+                        Prefira um nome exclusivo para reduzir a possibilidade
+                        de outras pessoas descobrirem seu tópico.
                     </p>
 
                 </div>
 
-
-                <h3>3. Copiar a URL do tópico</h3>
+                <h3>3. Copie a URL do tópico</h3>
 
                 <p>
                     Depois de criar o tópico, copie a
@@ -193,50 +110,67 @@
                 </div>
 
                 <p>
-                    Essa é a URL que será utilizada pela extensão
-                    para enviar as notificações.
+                    Essa é a URL que o Monitor SARP utilizará para enviar
+                    as notificações.
                 </p>
 
+                <h3>4. Configure a extensão</h3>
 
-                <h3>4. Configurar na Extensão</h3>
+                <p>
+                    Agora abra as configurações do Monitor SARP.
+                </p>
 
                 <ol>
 
                     <li>
-                        Clique com o botão direito no ícone da extensão
-                        <strong>Monitor SARP</strong>.
+                        Abra o popup do <strong>Monitor SARP</strong>.
                     </li>
 
                     <li>
-                        Selecione <strong>Opções</strong>.
+                        Clique no ícone de
+                        <strong>Configurações ⚙</strong>.
                     </li>
 
                     <li>
-                        No campo destinado às notificações,
-                        cole a <strong>URL completa do seu tópico ntfy</strong>.
+                        Localize o campo
+                        <strong>URL ntfy</strong>.
                     </li>
 
                     <li>
-                        Salve as configurações.
+                        Cole a URL completa do seu tópico.
+                    </li>
+
+                    <li>
+                        Clique em <strong>Salvar Preferências</strong>.
                     </li>
 
                 </ol>
 
-
                 <div class="success-box">
 
-                    <strong>✓ Pronto!</strong>
+                    <strong>✓ Configuração concluída!</strong>
 
                     <p>
-                        A partir de agora, quando o Monitor SARP detectar
-                        novos chamados, as notificações serão enviadas
-                        automaticamente para o seu celular através do ntfy.
+                        A partir desse momento, quando o Monitor SARP detectar
+                        um novo chamado, ele enviará automaticamente uma
+                        notificação para o tópico configurado no ntfy.
+                    </p>
+
+                </div>
+
+                <div class="alert alert-warning">
+
+                    <strong>⚠️ Atenção</strong>
+
+                    <p>
+                        Não compartilhe publicamente a URL do seu tópico.
+                        Qualquer pessoa que conheça essa URL poderá publicar
+                        mensagens nele.
                     </p>
 
                 </div>
 
             </section>
-
 
             <!-- CELULAR -->
             <section id="celular" class="section">
@@ -246,161 +180,78 @@
                 <h2>📱 Configuração recomendada no celular</h2>
 
                 <p>
-                    Para garantir que as notificações sejam recebidas
-                    mesmo com a tela bloqueada:
+                    Para aumentar a confiabilidade das notificações,
+                    principalmente quando o celular estiver bloqueado,
+                    verifique as seguintes configurações:
                 </p>
 
                 <ul>
 
                     <li>
-                        Permita as notificações do ntfy.
+                        Permita as <strong>notificações</strong> do ntfy.
                     </li>
 
                     <li>
-                        Permita notificações na tela de bloqueio.
+                        Permita notificações na
+                        <strong>tela de bloqueio</strong>.
                     </li>
 
                     <li>
-                        Permita vibração.
+                        Permita a <strong>vibração</strong> das notificações.
                     </li>
 
                     <li>
-                        Permita notificações em segundo plano.
+                        Não bloqueie o funcionamento do ntfy em
+                        <strong>segundo plano</strong>.
                     </li>
 
                     <li>
-                        Ative o <strong>Instant Delivery</strong> no ntfy,
-                        caso esteja disponível no seu dispositivo.
-                    </li>
-
-                    <li>
-                        No Android/MIUI, evite restringir o uso de bateria
-                        do ntfy em segundo plano.
+                        Caso o seu celular possua configurações de economia
+                        de bateria, evite restringir o uso do ntfy.
                     </li>
 
                 </ul>
 
-            </section>
+                <div class="alert alert-warning">
 
-
-            <!-- ESTRUTURA -->
-            <section id="estrutura" class="section">
-
-                <span class="section-label">DESENVOLVIMENTO</span>
-
-                <h2>📂 Estrutura de Arquivos</h2>
-
-                <ul class="file-list">
-
-                    <li>
-                        <code>background/</code>
-                        <span>
-                            Service worker que roda em segundo plano
-                            (<code>background.js</code>).
-                        </span>
-                    </li>
-
-                    <li>
-                        <code>content/</code>
-                        <span>
-                            Scripts injetados nas páginas acessadas pelo usuário
-                            (<code>content.js</code>, <code>content.css</code>).
-                        </span>
-                    </li>
-
-                    <li>
-                        <code>icons/</code>
-                        <span>
-                            Ícones da extensão
-                            (16x16, 48x48, 128x128).
-                        </span>
-                    </li>
-
-                    <li>
-                        <code>options/</code>
-                        <span>
-                            Página de configurações da extensão
-                            (<code>options.html</code>,
-                            <code>options.js</code>,
-                            <code>options.css</code>).
-                        </span>
-                    </li>
-
-                    <li>
-                        <code>popup/</code>
-                        <span>
-                            Interface gráfica
-                            (<code>popup.html</code>,
-                            <code>popup.css</code>,
-                            <code>popup.js</code>).
-                        </span>
-                    </li>
-
-                    <li>
-                        <code>manifest.json</code>
-                        <span>
-                            Manifesto V3 com declaração de permissões,
-                            scripts e popup.
-                        </span>
-                    </li>
-
-                </ul>
-
-            </section>
-
-
-            <!-- GIT -->
-            <section id="git" class="section">
-
-                <span class="section-label">DESENVOLVIMENTO</span>
-
-                <h2>🔧 Comandos Git</h2>
-
-
-                <h3>🔄 Antes de programar</h3>
-
-                <div class="terminal">
-                    <span>$</span> git pull
-                </div>
-
-
-                <h3>📤 Fazer commit</h3>
-
-                <div class="terminal terminal-multi">
-                    <div><span>$</span> git add .</div>
-                    <div><span>$</span> git commit -m "Descreva a alteração"</div>
-                    <div><span>$</span> git push</div>
-                </div>
-
-
-                <div class="alert alert-danger">
-
-                    <strong>⚠️ Alerta</strong>
+                    <strong>⚠️ Alguns celulares possuem restrições adicionais</strong>
 
                     <p>
-                        Sempre execute <code>git pull</code>
-                        antes de começar a programar.
+                        Fabricantes como Xiaomi, Samsung e outros podem aplicar
+                        regras próprias de economia de bateria que limitam
+                        aplicativos em segundo plano.
+                    </p>
+
+                    <p>
+                        Se as notificações demorarem ou não aparecerem com a
+                        tela bloqueada, verifique as configurações de bateria
+                        e notificações do ntfy no seu aparelho.
+                    </p>
+
+                </div>
+
+                <div class="success-box">
+
+                    <strong>✓ Tudo pronto</strong>
+
+                    <p>
+                        Com o ntfy configurado corretamente, o Monitor SARP
+                        poderá enviar os avisos de novos chamados diretamente
+                        para o seu celular.
                     </p>
 
                 </div>
 
             </section>
 
-
             <footer class="footer">
-
                 <strong>Monitor SARP</strong>
-
                 <span>
                     Extensão para Google Chrome — Manifest V3
                 </span>
-
             </footer>
 
-
         </main>
-
     </div>
-
 </body>
 </html>

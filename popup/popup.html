@@ -8,35 +8,24 @@
 </head>
 
 <body>
-
   <div class="popup-container">
-
-    <!-- Mensagem exibida fora do SARP -->
+    <!-- Mensagem exibida fora do SARP
     <div id="unavailableMessage" class="unavailable-message" style="display: none;">
-
       <div class="unavailable-icon">⚠</div>
-
       <div class="unavailable-title">
         Indisponível
       </div>
-
       <div class="unavailable-text">
         Esta extensão só pode ser utilizada dentro do SARP.
       </div>
-
-    </div>
-
+    </div> -->
 
     <!-- Conteúdo normal do Popup -->
     <div id="mainContent">
-
       <!-- Header -->
       <header class="header">
-
         <div class="brand">
-
           <div class="logo-icon">
-
             <svg
               width="18"
               height="18"
@@ -46,35 +35,24 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round">
-
               <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-
             </svg>
-
           </div>
-
           <div>
-
             <h1>Monitor SARP</h1>
-
             <span class="version">
               v1.0.2
             </span>
-
           </div>
-
         </div>
-
 
         <!-- Ações do Header -->
         <div class="header-actions">
-
           <!-- Ajuda -->
           <button
             id="btnHelp"
             class="icon-button"
             title="Ajuda">
-
             <svg
               width="16"
               height="16"
@@ -84,29 +62,22 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round">
-
               <circle cx="12" cy="12" r="10"></circle>
-
               <path d="M9.09 9a3 3 0 1 1 5.83 1c0 2-3 2-3 4"></path>
-
               <line
                 x1="12"
                 y1="17"
                 x2="12.01"
                 y2="17">
               </line>
-
             </svg>
-
           </button>
-
 
           <!-- Configurações -->
           <button
             id="btnOptions"
             class="icon-button"
             title="Configurações">
-
             <svg
               width="16"
               height="16"
@@ -114,140 +85,78 @@
               fill="none"
               stroke="currentColor"
               stroke-width="2">
-
               <circle cx="12" cy="12" r="3"></circle>
-
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
               </path>
-
             </svg>
-
           </button>
 
         </div>
-
       </header>
-
 
       <!-- Main Switch -->
       <div class="card status-card">
-
         <div class="status-header">
-
           <div>
 
             <span class="label">
               Status do Monitor
             </span>
-
             <div
               id="statusText"
               class="status-indicator">
-
               Ativo e Escaneando
-
             </div>
-
           </div>
 
-
           <label class="switch">
-
             <input
               type="checkbox"
               id="toggleMonitoring"
               checked>
-
             <span class="slider"></span>
-
           </label>
 
         </div>
 
-
         <div class="url-badge">
-
           <span class="dot"></span>
-
           <span id="currentDomain">
-            null
+            sarp.saude.rn.gov.br
           </span>
-
         </div>
-
       </div>
+       
+     <!-- Avisos -->
+    <div class="help-notices">
 
-
-      <!-- Quick Stats Grid -->
-      <div class="stats-grid">
-
-        <div class="stat-box">
-
-          <span
-            class="stat-value"
-            id="nabertos">
-
-            Obtendo...
-
-          </span>
-
-          <!-- statElements -->
-
-          <span class="stat-label">
-            TODOS ABERTOS
-          </span>
-
-        </div>
-
-
-        <div class="stat-box">
-
-          <span
-            class="stat-value"
-            id="nsuporte">
-
-           Obtendo...
-
-          </span>
-
-          <!-- statAlerts -->
-
-          <span class="stat-label">
-            SUPORTE ABERTOS
-          </span>
-
-        </div>
-
-      </div>
-
-
-      <!-- Quick Actions -->
-      <div class="actions-section">
-
-        <button
-          id="btnClearData"
-          class="btn btn-secondary">
-
-          Resetar Tudo
-
-        </button>
-
-      </div>
-
-
-      <!-- Footer -->
-      <footer class="footer">
-
+      <div class="help-notice">
+        <span class="notice-icon">?</span>
         <span>
-          Monitor SARP • Extensão Google Chrome
+          Precisa de ajuda?
+          <strong id="helpNoticeLink">Entre na Ajuda</strong>
         </span>
+      </div>
 
-      </footer>
+      <div class="help-notice">
+        <span class="notice-icon">⚙</span>
+        <span>
+          Deseja alterar alguma opção?
+          <strong id="optionsNoticeLink">Entre em Configurações</strong>
+        </span>
+      </div>
 
     </div>
 
-  </div>
+    <!-- Footer --> 
+    <footer class="footer"> 
+      <span> 
+        Monitor SARP • Extensão Google Chrome 
+      </span> 
+    </footer>
 
+    </div>
+  </div>
 
   <script src="popup.js"></script>
 

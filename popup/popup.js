@@ -5,112 +5,94 @@ document.addEventListener('DOMContentLoaded', async () => {
   const toggleMonitoring = document.getElementById('toggleMonitoring');
   const statusText = document.getElementById('statusText');
   const currentDomain = document.getElementById('currentDomain');
-  const btnClearData = document.getElementById('btnClearData');
+
+  const helpNoticeLink = document.getElementById('helpNoticeLink');
+  const optionsNoticeLink = document.getElementById('optionsNoticeLink');
 
   // Botões do Header
   const btnOptions = document.getElementById('btnOptions');
   const btnHelp = document.getElementById('btnHelp');
 
-  const nAbertos = document.getElementById('nabertos');
-  const nSuporte = document.getElementById('nsuporte');
-
   // Verifica se a aba atual é o SARP
-  const unavailableMessage = document.getElementById('unavailableMessage');
-  const mainContent = document.getElementById('mainContent');
+  // const unavailableMessage = document.getElementById('unavailableMessage');
+  // const mainContent = document.getElementById('mainContent');
 
-  try {
+  // try {
 
-    const [tab] = await chrome.tabs.query({
-      active: true,
-      currentWindow: true
-    });
+  //   const [tab] = await chrome.tabs.query({
+  //     active: true,
+  //     currentWindow: true
+  //   });
 
-    const isSarp = tab?.url?.startsWith(
-      'https://sarp.saude.rn.gov.br/'
-    );
+  //   const isSarp = tab?.url?.startsWith(
+  //     'https://sarp.saude.rn.gov.br/'
+  //   );
 
-    if (!isSarp) {
+  //   if (!isSarp) {
 
-      mainContent.style.display = 'none';
-      unavailableMessage.style.display = 'flex';
+  //     mainContent.style.display = 'none';
+  //     unavailableMessage.style.display = 'flex';
 
-      return;
-    }
+  //     return;
+  //   }
 
-  } catch (err) {
+  // } catch (err) {
 
-    console.error(
-      'Erro ao verificar aba atual:',
-      err
-    );
+  //   console.error(
+  //     'Erro ao verificar aba atual:',
+  //     err
+  //   );
 
-    mainContent.style.display = 'none';
-    unavailableMessage.style.display = 'flex';
+  //   mainContent.style.display = 'none';
+  //   unavailableMessage.style.display = 'flex';
 
-    return;
-  }
+  //   return;
+  // }
 
 
   // Obter aba ativa atual
-  try {
+  // try {
 
-    const [tab] = await chrome.tabs.query({
-      active: true,
-      currentWindow: true
-    });
+  //   const [tab] = await chrome.tabs.query({
+  //     active: true,
+  //     currentWindow: true
+  //   });
 
-    if (tab && tab.url) {
+  //   if (tab && tab.url) {
 
-      try {
+  //     try {
 
-        const urlObj = new URL(tab.url);
+  //       const urlObj = new URL(tab.url);
 
-        currentDomain.textContent =
-          urlObj.hostname ||
-          tab.url.substring(0, 25);
+  //       currentDomain.textContent =
+  //         urlObj.hostname ||
+  //         tab.url.substring(0, 25);
 
-      } catch {
+  //     } catch {
 
-        currentDomain.textContent =
-          tab.url.substring(0, 25);
+  //       currentDomain.textContent =
+  //         tab.url.substring(0, 25);
 
-      }
-    }
+  //     }
+  //   }
 
-  } catch (err) {
+  // } catch (err) {
 
-    console.warn(
-      'Erro ao obter aba ativa:',
-      err
-    );
-  }
+  //   console.warn( 'Erro ao obter aba ativa:', err );
+  // }
 
 
   // Carregar estado salvo via chrome.storage.sync
   chrome.storage.sync.get(
-    ['isActive', 'nAbertos', 'nSuporte'],
+    ['isActive'],
     (data) => {
 
       const isActive = data.isActive !== false;
-
       toggleMonitoring.checked = isActive;
-
       updateStatusUI(isActive);
-
-      // Testa e atualiza nAbertos
-      if (data.nAbertos !== undefined) {
-        nAbertos.textContent = data.nAbertos;
-      }
-
-      // Testa e atualiza nSuporte no mesmo fluxo
-      if (data.nSuporte !== undefined) {
-        nSuporte.textContent = data.nSuporte;
-      }
-
 
     }
   );
-
 
   // Atualizar indicador visual de status
   function updateStatusUI(isActive) {
@@ -135,27 +117,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     }
   }
-
-
-  // Limpar cache / dados salvos
-  // btnClearData.addEventListener(
-  //   'click',
-  //   async () => {
-
-  //     // await chrome.storage.sync.set({
-  //     //   alertCount: 0
-  //     // });
-
-  //     toggleMonitoring.checked =
-  //       false;
-
-  //     toggleMonitoring.dispatchEvent(
-  //       new Event('change')
-  //     );
-
-  //   }
-  // );
-
 
   // Alternar monitoramento
   toggleMonitoring.addEventListener(
@@ -218,6 +179,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         )
       });
 
+    }
+  );
+
+  helpNoticeLink.addEventListener(
+    'click',
+    () => {
+      btnHelp.click();
+    }
+  );
+
+  optionsNoticeLink.addEventListener(
+    'click',
+    () => {
+      btnOptions.click();
     }
   );
 

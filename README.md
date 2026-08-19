@@ -65,15 +65,6 @@ Para garantir que as notificações sejam recebidas mesmo com a tela bloqueada:
 
 ---
 
-## 📂 Estrutura de Arquivos
-
-- `background/`: Service worker que roda em segundo plano (`background.js`).
-- `content/`: Scripts injetados nas páginas acessadas pelo usuário (`content.js`, `content.css`).
-- `icons/`: Ícones da extensão (16x16, 48x48, 128x128).
-- `options/`: Página de configurações da extensão (`options.html`, `options.js`, `options.css`).
-- `popup/`: Interface gráfica (`popup.html`, `popup.css`, `popup.js`).
-- `manifest.json`: Manifesto V3 com declaração de permissões, scripts e popup.
-
 ## 🔧 Comandos Git
 
 ### 🔄 Antes de programar

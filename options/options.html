@@ -2,9 +2,11 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Monitor SARP - Configurações</title>
   <link rel="stylesheet" href="options.css">
 </head>
+
 <body>
   <div class="options-container">
     <header class="header">
@@ -19,41 +21,73 @@
       <section class="section">
         <h2>Monitoramento</h2>
         <div class="form-group">
-          <label for="monitoringInterval">Intervalo de Verificação (segundos):</label>
-                                                            <!-- Mudar pra seletor de 30 em 30 -->
-          <input type="number" id="monitoringInterval" min="30" max="300" value="30" disabled>
-          <span class="hint">Frequência em que o Monitor realiza checagens de atualização dos chamados. Valores válidos: 30 a 300 segundos.</span>
+          <label for="monitoringInterval">
+            Intervalo de Verificação (segundos):
+          </label>
+          <input
+            type="number"
+            id="monitoringInterval"
+            min="30"
+            max="300"
+            value="30"
+            disabled
+          >
+          <span class="hint">
+            Frequência em que o Monitor realiza checagens de atualização dos chamados.
+            Este valor é definido pelo sistema.
+          </span>
         </div>
 
         <div class="form-group">
-          <label for="targetSelector">Seletor do Tipo de chamados</label>
-                                                <!-- Mudar pra seletor de tipos -->
-          <input type="text" id="targetSelector" value="TODOS" disabled>
-          <span class="hint">Tipo de chamados que será enviado a notificação (ex: SUPORTE).</span>
+          <label for="targetSelector">
+            Seletor do Tipo de chamados
+          </label>
+          <select id="targetSelector">
+            <option value="TODOS">
+              TODOS
+            </option>
+            <option value="SUPORTE">
+              SUPORTE
+            </option>
+          </select>
+
+          <span class="hint">
+            Tipo de chamados que será enviado a notificação.
+          </span>
         </div>
 
         <div class="form-group">
-          <label for="targetSelector">URL ntfy</label>
-                                                <!-- Mudar pra seletor de tipos -->
-          <input type="text" id="ntfyurl" value="">
-          <span class="hint">Coloque a URL do nfty aqui e salve as preferências.</span>
+          <label for="ntfyurl">
+            URL ntfy
+          </label>
+          <input
+            type="text"
+            id="ntfyurl"
+            placeholder="Digite sua URL ntfy"
+          >
+          <span class="hint">
+            Coloque a URL do ntfy aqui e salve as preferências.
+          </span>
         </div>
-
-        <!-- <div class="form-group"> -->
-          <!-- <label for="targetSelector">Chat ID TELEGRAM</label> -->
-          <!-- <input type="text" id="chatidtel" value=""''> -->
-          <!-- <span class="hint">Cole o Chat ID do TELEGRAM aqui e salve as preferências.</span> -->
-        <!-- </div> -->
       </section>
 
       <!-- Ações -->
       <div class="actions">
-        <button id="btnSave" class="btn btn-primary">Salvar Preferências</button>
-        <span id="saveStatus" class="save-status"></span>
+        <button
+          id="btnSave"
+          class="btn btn-primary"
+        >
+          Salvar Preferências
+        </button>
+        <span
+          id="saveStatus"
+          class="save-status"
+        ></span>
       </div>
     </main>
   </div>
 
   <script src="options.js"></script>
+
 </body>
 </html>

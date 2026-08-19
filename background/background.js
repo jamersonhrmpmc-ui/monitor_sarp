@@ -37,8 +37,8 @@ chrome.runtime.onInstalled.addListener( (details) => {
     chrome.action.setBadgeBackgroundColor({ color: '#64748b' });
 
     // Cria o alarme de 30 segundos.
-    chrome.alarms.create( ALARM_NAME, { periodInMinutes: 0.5 } );
-    console.log( '[Monitor SARP] Alarme criado.' );
+    // chrome.alarms.create( ALARM_NAME, { periodInMinutes: 0.5 } );
+    // console.log( '[Monitor SARP] Alarme criado.' );
   }
 );
 
@@ -529,48 +529,75 @@ chrome.alarms.onAlarm.addListener(
 
 // ATIVA / DESATIVA MONITORAMENTO
 chrome.runtime.onMessage.addListener(
-  ( request, sender, sendResponse
+  async ( request, sender, sendResponse
   ) => {
 
     console.log( '[Monitor SARP] Mensagem recebida:', request.action, request );
 
-    switch (
-      request.action
-    ) {
+    switch ( request.action ) {
 
       // TOGGLE
       case 'TOGGLE_MONITORING': {
         const isActive = request.payload?.isActive === true;
-        chrome.storage.sync.set({ isActive });
+        await chrome.storage.sync.set({ isActive });
 
         chrome.action.setBadgeText({ text: isActive ? 'ON' : 'OFF' });
         chrome.action.setBadgeBackgroundColor({ color: isActive ? '#0284c7' : '#64748b' });
 
+         // Manda o comando de atualizar pagina pra o content
+          const abas = await chrome.tabs.query({ url: 'https://sarp.saude.rn.gov.br/ti/chamados*' });
+
+          for (const aba of abas) {
+
+            if (aba.id) {
+
+              chrome.tabs.sendMessage(
+                aba.id,
+                {
+                  action: 'ATT_PAG'
+                }
+              ).catch(() => {});
+            }
+          }
+
         // Se acabou de ativar consulta imediatamente
         if (isActive) {
+
+          // Limpa a referência anterior SEMPRE que o monitor for ligado
+          await chrome.storage.session.remove('sarpMonitor');
+
+          // Cria/recria o alarme
+          chrome.alarms.create(ALARM_NAME, { periodInMinutes: 0.5 });
+          console.log( '[Monitor SARP] Alarme criado.' );
+
           executarMonitoramento();
+        } else {
+
+          // Para completamente o monitoramento periódico
+          await chrome.alarms.clear(ALARM_NAME);
+          console.log('[Monitor SARP] Monitor OFF. Alarme removido.');
         }
 
         // Aatualiza HUD da pagina
-        chrome.tabs.query(
-          {
-            active: true,
-            currentWindow: true
-          },
-
+        chrome.tabs.query( { url: 'https://sarp.saude.rn.gov.br/*' },
           (tabs) => {
-            if (
-              tabs[0]?.id
-            ) {
 
-              chrome.tabs.sendMessage( tabs[0].id,
-                {
-                  action: 'TOGGLE_HUD',
-                  isActive
-                }
+            tabs.forEach(tab => {
 
-              ).catch( () => {} );
-            }
+              if (tab.id) {
+
+                chrome.tabs.sendMessage(
+                  tab.id,
+                  {
+                    action: 'TOGGLE_HUD',
+                    isActive
+                  }
+                ).catch(() => {});
+
+              }
+
+            });
+
           }
         );
 

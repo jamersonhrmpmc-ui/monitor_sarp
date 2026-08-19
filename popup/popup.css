@@ -1,7 +1,6 @@
 :root {
   --bg-primary: #0f172a;
   --bg-card: #1e293b;
-  --bg-card-hover: #334155;
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --accent: #38bdf8;
@@ -9,6 +8,7 @@
   --success: #10b981;
   --border: #334155;
   --radius: 8px;
+
   user-select: none;
 }
 
@@ -16,7 +16,15 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    sans-serif;
 }
 
 body {
@@ -28,6 +36,9 @@ body {
 
 .popup-container {
   padding: 14px;
+}
+
+#mainContent {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -40,7 +51,6 @@ body {
   justify-content: space-between;
 }
 
-/* NOVO: agrupa os botões de Ajuda e Configurações */
 .header-actions {
   display: flex;
   align-items: center;
@@ -77,6 +87,7 @@ body {
   color: var(--text-muted);
 }
 
+/* Botões do Header */
 .icon-button {
   background: transparent;
   border: none;
@@ -95,7 +106,7 @@ body {
   color: var(--text-main);
 }
 
-/* Status Card */
+/* Card de Status */
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -128,6 +139,7 @@ body {
   color: #ff0000;
 }
 
+/* URL */
 .url-badge {
   display: flex;
   align-items: center;
@@ -146,7 +158,7 @@ body {
   background: var(--success);
 }
 
-/* Toggle Switch */
+/* Toggle */
 .switch {
   position: relative;
   display: inline-block;
@@ -168,7 +180,7 @@ body {
   right: 0;
   bottom: 0;
   background-color: #475569;
-  transition: .2s;
+  transition: 0.2s;
   border-radius: 22px;
 }
 
@@ -180,7 +192,7 @@ body {
   left: 3px;
   bottom: 3px;
   background-color: white;
-  transition: .2s;
+  transition: 0.2s;
   border-radius: 50%;
 }
 
@@ -192,89 +204,48 @@ input:checked + .slider:before {
   transform: translateX(18px);
 }
 
-/* Stats Grid */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
-
-.stat-box {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 8px 4px;
-  text-align: center;
-}
-
-.stat-value {
-  display: block;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.stat-label {
-  font-size: 10px;
-  color: var(--text-muted);
-}
-
-/* Actions Section */
-.actions-section {
+/* Avisos */
+.help-notices {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.btn {
+.help-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  background: rgba(30, 41, 59, 0.65);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.help-notice strong {
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.help-notice strong:hover {
+  text-decoration: underline;
+}
+
+.notice-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-primary {
-  background: #0284c7;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #0369a1;
-}
-
-.button-group {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-}
-
-.btn-secondary {
-  background: var(--bg-card);
-  color: var(--text-main);
-  border: 1px solid var(--border);
-}
-
-.btn-secondary:hover {
-  background: var(--bg-card-hover);
-}
-
-.btn-secondary:active {
-  scale: 0.96;
-}
-
-.badge {
-  background: #1e293b;
+  border-radius: 50%;
+  background: rgba(56, 189, 248, 0.12);
   color: var(--accent);
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 /* Footer */
@@ -283,41 +254,4 @@ input:checked + .slider:before {
   font-size: 10px;
   color: #64748b;
   padding-top: 2px;
-}
-
-/* Conteúdo normal do Popup */
-#mainContent {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* Mensagem fora do SARP */
-.unavailable-message {
-  min-height: 100px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 8px;
-  user-select: none;
-}
-
-.unavailable-icon {
-  font-size: 48px;
-  color: #f59e0b;
-}
-
-.unavailable-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-.unavailable-text {
-  max-width: 240px;
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--text-muted);
 }

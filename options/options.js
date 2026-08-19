@@ -1,9 +1,9 @@
 // Monitor SARP - Options Controller
 document.addEventListener('DOMContentLoaded', () => {
+
   const monitoringInterval = document.getElementById('monitoringInterval');
   const targetSelector = document.getElementById('targetSelector');
   const ntfyURL = document.getElementById('ntfyurl');
- 
   const btnSave = document.getElementById('btnSave');
   const saveStatus = document.getElementById('saveStatus');
 
@@ -13,38 +13,45 @@ document.addEventListener('DOMContentLoaded', () => {
     ntfyURL: '',
   }, (items) => {
     targetSelector.value = items.targetSelector;
-    ntfyURL.value = items.tokentel;
+    ntfyURL.value = items.ntfyURL;
   });
 
   // Salvar preferências
   btnSave.addEventListener('click', () => {
-
     const ntfyUrl = ntfyURL.value.trim();
 
     // Validação
-    if (!ntfyUrl){
+    if (!ntfyUrl) {
       saveStatus.textContent = 'Preencha a URL!';
       saveStatus.style.color = '#e74c3c';
       saveStatus.style.opacity = '1';
       setTimeout(() => {
         saveStatus.style.opacity = '0';
-        saveStatus.style.color = ''; // volta a cor original
+        saveStatus.style.color = '';
       }, 3000);
+
       return;
     }
 
     const config = {
-      targetSelector: targetSelector.value || 'TODOS',
-      ntfyURL: ntfyUrl,
+      targetSelector:
+        targetSelector.value || 'TODOS',
+      ntfyURL:
+        ntfyUrl,
     };
 
     chrome.storage.sync.set(config, () => {
-      saveStatus.textContent = 'Preferências salvas com sucesso!';
-      saveStatus.style.color = '#2ecc71'; // verde (opcional)
-      saveStatus.style.opacity = '1';
+      saveStatus.textContent =
+        'Preferências salvas com sucesso!';
+      saveStatus.style.color =
+        '#2ecc71';
+      saveStatus.style.opacity =
+        '1';
       setTimeout(() => {
-        saveStatus.style.opacity = '0';
-        saveStatus.style.color = '';
+        saveStatus.style.opacity =
+          '0';
+        saveStatus.style.color =
+          '';
       }, 2500);
     });
   });
