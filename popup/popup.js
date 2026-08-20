@@ -196,4 +196,72 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   );
 
+  testarntfy.addEventListener(
+    'click',
+    () => {
+      testeNtfy();
+    }
+  );
+
+  // FUNÇÃO DE TESTE SIMPLIFICADA
+  async function testeNtfy() {
+    console.log('[Monitor SARP] ===== INÍCIO DO TESTE =====');
+
+    try {
+      const { ntfyURL: ntfyUrl } = await chrome.storage.sync.get(['ntfyURL']);
+
+      if (!ntfyUrl) {
+        console.warn('[Monitor SARP] URL do ntfy não configurada');
+        return;
+      }
+
+      const mensagem = '🧪 TESTE CONCLUIDO\n\nMonitor SARP funcionando corretamente.';
+
+      const sucesso = await enviarParaNtfy(mensagem, ntfyUrl);
+
+      if (sucesso) {
+        console.log('[Monitor SARP] Teste enviado com sucesso para o ntfy');
+      } else {
+        console.warn('[Monitor SARP] Falha ao enviar o teste');
+      }
+
+    } catch (erro) {
+      console.warn('[Monitor SARP] Erro durante o teste:', erro);
+    }
+
+    console.log('[Monitor SARP] ===== FIM DO TESTE =====');
+  }
+
+  // ENVIA A MENSAGEM PARA O ntfy
+  async function enviarParaNtfy(mensagem, ntfyUrl) {
+    try {
+
+      const response = await fetch(ntfyUrl, {
+        method: 'POST',
+        headers: {
+          'Title': 'Monitor SARP',
+          'Priority': 'high'
+        },
+        body: mensagem
+      });
+
+      if (!response.ok) {
+        const data = await response.text();
+        console.error( '[Monitor SARP] Erro ntfy:', response.status, data );
+        return false;
+      }
+
+      console.log( '[Monitor SARP] Mensagem enviada com sucesso para o ntfy' );
+      return true;
+
+    } catch (error) {
+
+      console.warn( '[Monitor SARP] Falha ao enviar para o ntfy:',
+        error
+      );
+      return false;
+
+    }
+  }
+
 });

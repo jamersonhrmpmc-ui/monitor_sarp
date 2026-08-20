@@ -1,5 +1,10 @@
 // Monitor SARP - Background Service Worker (Manifest V3)
-console.log('[Monitor SARP] Background Service Worker inicializado.');
+const DEBUG = true;
+function log(...args) {
+  if (DEBUG) console.log(...args);
+}
+
+log('[Monitor SARP] Background Service Worker inicializado.');
 
 const ENDPOINT = 'https://sarp.saude.rn.gov.br/ti/chamados/getChamados';
 const ALARM_NAME = 'monitorSarpPulse';
@@ -15,7 +20,7 @@ restoreBadge();
 
 // EXTENSÃO INSTALADA ou ATUALIZADA
 chrome.runtime.onInstalled.addListener( (details) => {
-    console.log( '[Monitor SARP] Extensão instalada/atualizada:', details.reason );
+    log( '[Monitor SARP] Extensão instalada/atualizada:', details.reason );
 
     // Sempre começa OFF.
     chrome.storage.sync.set({
@@ -38,19 +43,19 @@ chrome.runtime.onInstalled.addListener( (details) => {
 
     // Cria o alarme de 30 segundos.
     // chrome.alarms.create( ALARM_NAME, { periodInMinutes: 0.5 } );
-    // console.log( '[Monitor SARP] Alarme criado.' );
+    // log( '[Monitor SARP] Alarme criado.' );
   }
 );
 
 // FUNÇÃO PRINCIPAL DO MONITOR
 async function executarMonitoramento() {
-  console.log( '[Monitor SARP] Executando monitoramento...' );
+  log( '[Monitor SARP] Executando monitoramento...' );
 
   // Verifica se o monitor está ativo
   const config = await chrome.storage.sync.get([ 'isActive' ]);
 
   if ( config.isActive !== true ) {
-    console.log( '[Monitor SARP] Monitor está OFF.' );
+    log( '[Monitor SARP] Monitor está OFF.' );
     return;
   }
 
@@ -62,11 +67,11 @@ async function executarMonitoramento() {
 
   // Verifica se não existe aba do SARP
   if (!abaSarp?.id) {
-    console.log( '[Monitor SARP] Nenhuma aba do SARP encontrada.' );
+    log( '[Monitor SARP] Nenhuma aba do SARP encontrada.' );
     return;
   }
 
-  console.log( '[Monitor SARP] Aba SARP encontrada:', abaSarp.id, abaSarp.url );
+  log( '[Monitor SARP] Aba SARP encontrada:', abaSarp.id, abaSarp.url );
 
   // Se existir verifica autenticação pelo getChamados()
   try {
@@ -75,7 +80,7 @@ async function executarMonitoramento() {
 
     // Verifica se o usuário está logado no SARP
     if ( !resultado.logado ) {
-      console.log( '[Monitor SARP] Usuário não está logado no SARP.', resultado.motivo || '' );
+      log( '[Monitor SARP] Usuário não está logado no SARP.', resultado.motivo || '' );
 
       chrome.action.setBadgeText({ text: 'Auth' });
       chrome.action.setBadgeBackgroundColor({ color: '#dc2626' });
@@ -170,17 +175,17 @@ async function consultarChamados() {
   switch (targetSelector) {
     case 'TODOS':
       url = urlTodos;
-      console.log( '[Monitor SARP] Consultando: TODOS: ', url );
+      log( '[Monitor SARP] Consultando: TODOS: ', url );
       break;
           
     case 'SUPORTE':
       url = urlSuporte;
-      console.log( '[Monitor SARP] Consultando: SUPORTE: ', url );
+      log( '[Monitor SARP] Consultando: SUPORTE: ', url );
       break;
           
     default:
       url = urlTodos;
-      console.log( '[Monitor SARP] Consultando: TODOS: ', url );
+      log( '[Monitor SARP] Consultando: TODOS: ', url );
       break;
   }
 
@@ -198,7 +203,7 @@ async function consultarChamados() {
 
   // HTTP 401
   if ( response.status === 401 ) {
-    console.log( '[Monitor SARP] HTTP 401: sessão do SARP não autenticada.' );
+    log( '[Monitor SARP] HTTP 401: sessão do SARP não autenticada.' );
     return {
       logado: false,
       json: null,
@@ -208,7 +213,7 @@ async function consultarChamados() {
 
   // HTTP 403
   if ( response.status === 403 ) {
-    console.log( '[Monitor SARP] HTTP 403: acesso negado pelo SARP.' );
+    log( '[Monitor SARP] HTTP 403: acesso negado pelo SARP.' );
     return {
       logado: false,
       json: null,
@@ -232,7 +237,7 @@ async function consultarChamados() {
     texto .trim() .startsWith( '<!DOCTYPE' ) ||
     texto .trim() .startsWith( '<html' )
   ) {
-    console.log( '[Monitor SARP] Servidor retornou HTML. Provavelmente não autenticado.' );
+    log( '[Monitor SARP] Servidor retornou HTML. Provavelmente não autenticado.' );
     return {
       logado: false,
       json: null,
@@ -258,7 +263,7 @@ async function consultarChamados() {
 
   // Confirma se é a estrutura esperada do JSON
   if ( !json || !Array.isArray( json.data ) ) {
-    console.log( '[Monitor SARP] JSON recebido não possui data[].' );
+    log( '[Monitor SARP] JSON recebido não possui data[].' );
     return {
       logado: false,
       json: null,
@@ -267,7 +272,7 @@ async function consultarChamados() {
   }
 
   // Login confirmado e JSON válido
-  console.log( '[Monitor SARP] Sessão autenticada. JSON recebido corretamente.' );
+  log( '[Monitor SARP] Sessão autenticada. JSON recebido corretamente.' );
   return {
     logado: true,
     json,
@@ -288,7 +293,7 @@ async function processarChamados(json) {
       .toUpperCase() === 'ABERTO';
   });
 
-  console.log( `[Monitor SARP] ${chamadosAbertos.length} chamados abertos encontrados.` );
+  log( `[Monitor SARP] ${chamadosAbertos.length} chamados abertos encontrados.` );
 
   // Converte para o formato organizado.
   const chamados = chamadosAbertos.map( extrairDadosChamado );
@@ -304,8 +309,8 @@ async function processarChamados(json) {
 
   // Primeira consulta sem referencia anterior.
   if ( !monitorAnterior ) {
-    console.log( '[Monitor SARP] Primeira consulta.' );
-    console.log( '[Monitor SARP] Criando referência inicial.' );
+    log( '[Monitor SARP] Primeira consulta.' );
+    log( '[Monitor SARP] Criando referência inicial.' );
     await salvarMonitor(
       json,
       chamados,
@@ -323,15 +328,15 @@ async function processarChamados(json) {
 
   // Mostra resultado da comparação.
   if ( novosChamados.length > 0 ) {
-    console.log( `[Monitor SARP] ${novosChamados.length} NOVO(S) CHAMADO(S)!` );
+    log( `[Monitor SARP] ${novosChamados.length} NOVO(S) CHAMADO(S)!` );
 
     await notificarNovosChamados(novosChamados);
 
-    novosChamados.forEach( chamado => { console.log( '[NOVO CHAMADO]', chamado );});
+    novosChamados.forEach( chamado => { log( '[NOVO CHAMADO]', chamado );});
 
   } else {
 
-    console.log( '[Monitor SARP] Nenhum chamado novo.' );
+    log( '[Monitor SARP] Nenhum chamado novo.' );
   }
 
   // Salva consulta atual.
@@ -343,33 +348,96 @@ async function processarChamados(json) {
   );
 }
 
+// Formata a data de forma legível
+function formatarData(dataISO) {
+  if (!dataISO) return '-';
+  try {
+    const data = new Date(dataISO);
+    return data.toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch {
+    return dataISO;
+  }
+}
+
 // ENVIA AS NOVAS NOTIFICAÇÕES PARA O ntfy
 async function notificarNovosChamados(chamados) {
+  if (!chamados || chamados.length === 0) return;
+
+  const loteParaSalvar = [];
+
   for (const chamado of chamados) {
-    console.log( '[Monitor SARP] Enviando notificação:', chamado );
+    log('[Monitor SARP] Processando notificação:', chamado.numero);
 
+    const isSuporte = String(chamado.tipo || '').toUpperCase().includes('SUPORTE');
+
+    // Busca nome + telefone + descrição
+    const { nome, telefone, descricaoReal } = await buscarDadosSolicitante(chamado.id, isSuporte);
+
+    const descricaoFinal = (isSuporte && descricaoReal) 
+      ? descricaoReal 
+      : 'Olhar no SARP';
+
+    // Monta a mensagem do ntfy
     const mensagem = `
-      🚨 NOVO CHAMADO NO SARP
+🚨 NOVO CHAMADO NO SARP
 
-      📋 Chamado: ${chamado.numero}
-      📌 Status: ${chamado.status}
-      🛠️ Serviço: ${chamado.servico}
-      🏢 Setor: ${chamado.setor}
-      ⚠️ Prioridade: ${chamado.prioridade}
-      📅 Data: ${chamado.criadoEm}
+📋 Chamado: ${chamado.numero}
+👤 Solicitante: ${nome || 'Não informado'}
+📞 Telefone: ${telefone || 'Não informado'}
+📌 Status: ${chamado.status || '-'}
+🛠️ Serviço: ${chamado.servico || '-'}
+🏢 Setor: ${chamado.setor || '-'}
+⚠️ Prioridade: ${chamado.prioridade || '-'}
+📅 Data: ${formatarData(chamado.criadoEm)}
+
+📝 Descrição:
+${descricaoFinal}
     `.trim();
 
-    console.log( '[Monitor SARP] Mensagem ntfy:', mensagem );
+    log('[Monitor SARP] Mensagem ntfy:', mensagem);
 
-    // Pega das configurações da extensão
-    const { ntfyURL: ntfyUrl, } = await chrome.storage.sync.get([ 'ntfyURL' ]);
-
+    // Envia para o ntfy
+    const { ntfyURL: ntfyUrl } = await chrome.storage.sync.get(['ntfyURL']);
     if (ntfyUrl) {
-      await enviarParaNtfy( mensagem, ntfyUrl );
-
+      await enviarParaNtfy(mensagem, ntfyUrl);
     } else {
+      console.warn('[Monitor SARP] URL do ntfy não configurada');
+    }
 
-      console.warn( '[Monitor SARP] URL do ntfy não configurada' );
+    // Guarda os dados limpos para o HUD
+    loteParaSalvar.push({
+      id: chamado.id,
+      numero: chamado.numero,
+      nome: nome || 'Não informado',
+      setor: chamado.setor || '-',
+      telefone: telefone || null,
+      servico: chamado.servico || null,
+      prioridade: chamado.prioridade || null
+    });
+  }
+
+  // Sempre sobrescreve o lote anterior
+  await chrome.storage.session.set({
+    ultimosChamados: loteParaSalvar,
+    atualizadoEm: formatarData(new Date())
+  });
+
+  log('[Monitor SARP] Lote salvo no session:', loteParaSalvar);
+
+  // Avisa o content script (HUD) que tem dados novos
+  const tabs = await chrome.tabs.query({ url: 'https://sarp.saude.rn.gov.br/*' });
+  for (const tab of tabs) {
+    if (tab.id) {
+      chrome.tabs.sendMessage(tab.id, {
+        action: 'ATUALIZAR_HUD_CHAMADOS',
+        chamados: loteParaSalvar
+      }).catch(() => {});
     }
   }
 }
@@ -393,7 +461,7 @@ async function enviarParaNtfy(mensagem, ntfyUrl) {
       return false;
     }
 
-    console.log( '[Monitor SARP] Mensagem enviada com sucesso para o ntfy' );
+    log( '[Monitor SARP] Mensagem enviada com sucesso para o ntfy' );
     return true;
 
   } catch (error) {
@@ -406,10 +474,115 @@ async function enviarParaNtfy(mensagem, ntfyUrl) {
   }
 }
 
+// Busca nome, telefone e descrição real na página show/{id}
+async function buscarDadosSolicitante(chamadoId, isSuporte = false) {
+  try {
+    const url = `https://sarp.saude.rn.gov.br/ti/chamados/show/${chamadoId}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      credentials: 'include',
+      cache: 'no-store',
+      headers: {
+        'Accept': 'text/html',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+
+    if (!response.ok) {
+      log(`[Monitor SARP] Erro ao buscar show/${chamadoId}: HTTP ${response.status}`);
+      return {
+        nome: null,
+        telefone: null,
+        descricaoReal: null
+      };
+    }
+
+    const html = await response.text();
+
+    // ===== NOME =====
+    let nome = null;
+
+    const nomeMatch = html.match(
+      /<small[^>]*>\s*Solicitante:\s*<\/small>[\s\S]{0,1000}?<a[^>]*>([\s\S]*?)<\/a>/i
+    );
+
+    if (nomeMatch) {
+      nome = nomeMatch[1]
+        .replace(/<[^>]+>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      // Remove os dados do popover e deixa somente o nome
+      if (nome.includes("'>")) {
+        nome = nome.split("'>")[1].trim();
+      }
+    }
+
+    // ===== TELEFONE =====
+    let telefone = null;
+
+    const telefoneMatch = html.match(
+      /<small[^>]*>\s*Telefone:\s*<\/small>[\s\S]{0,250}?<span[^>]*>\s*([^<]+?)\s*<\/span>/i
+    );
+
+    if (telefoneMatch) {
+      telefone = telefoneMatch[1]
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    // ===== DESCRIÇÃO =====
+    let descricaoReal = null;
+
+    if (isSuporte) {
+      const descricaoMatch =
+        html.match(
+          /<small[^>]*>\s*Descricao:\s*<\/small>[\s\S]{0,500}?<span[^>]*>([\s\S]*?)<\/span>/i
+        ) ||
+        html.match(
+          /<small[^>]*>\s*Descrição:\s*<\/small>[\s\S]{0,500}?<span[^>]*>([\s\S]*?)<\/span>/i
+        );
+
+      if (descricaoMatch) {
+        descricaoReal = descricaoMatch[1]
+          .replace(/<br\s*\/?>/gi, '\n')
+          .replace(/<[^>]+>/g, '')
+          .replace(/&nbsp;/gi, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+    }
+
+    log(`[Monitor SARP] Dados solicitante (${chamadoId}):`, {
+      nome,
+      telefone,
+      descricaoReal
+    });
+
+    return {
+      nome: nome || null,
+      telefone: telefone || null,
+      descricaoReal: descricaoReal || null
+    };
+
+  } catch (erro) {
+    console.warn(
+      `[Monitor SARP] Erro ao buscar dados do solicitante ${chamadoId}:`,
+      erro
+    );
+
+    return {
+      nome: null,
+      telefone: null,
+      descricaoReal: null
+    };
+  }
+}
+
 // EXTRAÇÃO DOS DADOS IMPORTANTES
 function extrairDadosChamado(c) {
   const dados = {
-
     // Identificação
     id: c?.id ?? null,
     numero: c?.numero ?? null,
@@ -432,11 +605,9 @@ function extrairDadosChamado(c) {
     servico: c?.servico?.name ?? null,
     tipoSolicitacao: c?.servico?.tipo_solicitacao ?? null,
 
-    // Categoria
+    // Categoria / Instância
     categoriaId: c?.servico?.categoria_id ?? null,
     categoria: c?.servico?.categoria?.name ?? null,
-
-    // Instancia
     instanciaId: c?.servico?.categoria?.instancia_id ?? null,
     instancia: c?.servico?.categoria?.instancia?.name ?? null,
 
@@ -460,11 +631,9 @@ function extrairDadosChamado(c) {
     unidadeSigla: c?.local?.setor?.coordenacao?.unidade?.sigla ?? null,
     cidade: c?.local?.setor?.coordenacao?.unidade?.cidade ?? null,
 
-    // Prioridade
+    // Prioridade + SLA
     prioridadeId: c?.sla?.prioridade_id ?? null,
     prioridade: c?.sla?.prioridade?.name ?? null,
-
-    // SLA
     slaId: c?.sla?.id ?? null,
     slaNivel: c?.sla?.nivel_id ?? null,
     slaTempoResposta: c?.sla?.tempo_resposta ?? null,
@@ -472,8 +641,13 @@ function extrairDadosChamado(c) {
     slaDataLimiteResposta: c?.sla?.data_limite_resposta ?? null,
     slaDataLimiteSolucao: c?.sla?.data_limite_solucao ?? null,
 
-    // Descrição
-    descricao: c?.descricao ?? null
+    // Descrição bruta (do JSON)
+    descricao: c?.descricao ?? null,
+
+    // Novos campos (preenchidos depois)
+    solicitanteNome: null,
+    solicitanteTelefone: null,
+    descricaoFinal: null   // será "Olhar no SARP" ou a descrição real
   };
 
   return dados;
@@ -511,7 +685,7 @@ async function salvarMonitor(
   //await chrome.storage.local.set({ sarpMonitor: dadosParaSalvar });
   await chrome.storage.session.set({ sarpMonitor: dadosParaSalvar });
 
-  console.log( '[Monitor SARP] Dados salvos no storage.' );
+  log( '[Monitor SARP] Dados salvos no storage.' );
 }
 
 // ALARME
@@ -521,97 +695,79 @@ chrome.alarms.onAlarm.addListener(
       return;
     }
 
-    console.log( '[Monitor SARP] Pulso de monitoramento.');
+    log( '[Monitor SARP] Pulso de monitoramento.');
 
     await executarMonitoramento();
   }
 );
 
-// ATIVA / DESATIVA MONITORAMENTO
-chrome.runtime.onMessage.addListener(
-  async ( request, sender, sendResponse
-  ) => {
+// ATIVA / DESATIVA MONITORAMENTO E RECEBE MENSAGENS
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  log('[Monitor SARP] Mensagem recebida:', request.action, request);
 
-    console.log( '[Monitor SARP] Mensagem recebida:', request.action, request );
+  if (request.action === 'TOGGLE_MONITORING') {
+    // Isolado o async aqui dentro para não quebrar o sendResponse
+    (async () => {
+      const isActive = request.payload?.isActive === true;
+      await chrome.storage.sync.set({ isActive });
 
-    switch ( request.action ) {
+      chrome.action.setBadgeText({ text: isActive ? 'ON' : 'OFF' });
+      chrome.action.setBadgeBackgroundColor({ color: isActive ? '#0284c7' : '#64748b' });
 
-      // TOGGLE
-      case 'TOGGLE_MONITORING': {
-        const isActive = request.payload?.isActive === true;
-        await chrome.storage.sync.set({ isActive });
-
-        chrome.action.setBadgeText({ text: isActive ? 'ON' : 'OFF' });
-        chrome.action.setBadgeBackgroundColor({ color: isActive ? '#0284c7' : '#64748b' });
-
-         // Manda o comando de atualizar pagina pra o content
-          const abas = await chrome.tabs.query({ url: 'https://sarp.saude.rn.gov.br/ti/chamados*' });
-
-          for (const aba of abas) {
-
-            if (aba.id) {
-
-              chrome.tabs.sendMessage(
-                aba.id,
-                {
-                  action: 'ATT_PAG'
-                }
-              ).catch(() => {});
-            }
-          }
-
-        // Se acabou de ativar consulta imediatamente
-        if (isActive) {
-
-          // Limpa a referência anterior SEMPRE que o monitor for ligado
-          await chrome.storage.session.remove('sarpMonitor');
-
-          // Cria/recria o alarme
-          chrome.alarms.create(ALARM_NAME, { periodInMinutes: 0.5 });
-          console.log( '[Monitor SARP] Alarme criado.' );
-
-          executarMonitoramento();
-        } else {
-
-          // Para completamente o monitoramento periódico
-          await chrome.alarms.clear(ALARM_NAME);
-          console.log('[Monitor SARP] Monitor OFF. Alarme removido.');
+      // Manda o comando de atualizar pagina pra o content
+      const abas = await chrome.tabs.query({ url: 'https://sarp.saude.rn.gov.br/ti/chamados*' });
+      for (const aba of abas) {
+        if (aba.id) {
+          chrome.tabs.sendMessage(aba.id, { action: 'ATT_PAG' }).catch(() => {});
         }
-
-        // Aatualiza HUD da pagina
-        chrome.tabs.query( { url: 'https://sarp.saude.rn.gov.br/*' },
-          (tabs) => {
-
-            tabs.forEach(tab => {
-
-              if (tab.id) {
-
-                chrome.tabs.sendMessage(
-                  tab.id,
-                  {
-                    action: 'TOGGLE_HUD',
-                    isActive
-                  }
-                ).catch(() => {});
-
-              }
-
-            });
-
-          }
-        );
-
-        sendResponse({ success: true, isActive });
-        break;
       }
 
-      // DEFAULT
-      default: sendResponse({ status: 'unknown_action' });
-    }
+      // Se acabou de ativar consulta imediatamente
+      if (isActive) {
+        await chrome.storage.session.remove('sarpMonitor');
+        chrome.alarms.create(ALARM_NAME, { periodInMinutes: 0.5 });
+        log('[Monitor SARP] Alarme criado.');
+        executarMonitoramento();
+      } else {
+        await chrome.alarms.clear(ALARM_NAME);
+        log('[Monitor SARP] Monitor OFF. Alarme removido.');
+      }
 
+      // Atualiza HUD da pagina
+      chrome.tabs.query({ url: 'https://sarp.saude.rn.gov.br/*' }, (tabs) => {
+        tabs.forEach(tab => {
+          if (tab.id) {
+            chrome.tabs.sendMessage(tab.id, { action: 'TOGGLE_HUD', isActive }).catch(() => {});
+          }
+        });
+      });
+
+      sendResponse({ success: true, isActive });
+    })();
+    
+    // Retorna true SÍNCRONO para avisar ao Chrome que responderemos depois
+    return true; 
+  }
+
+  if (request.action === 'OBTER_ULTIMOS_CHAMADOS') {
+    // Busca no storage session e envia a resposta com .then()
+    chrome.storage.session.get(['ultimosChamados', 'atualizadoEm']).then((dados) => {
+      sendResponse({
+        success: true,
+        ultimosChamados: Array.isArray(dados.ultimosChamados) ? dados.ultimosChamados : [],
+        atualizadoEm: dados.atualizadoEm || null
+      });
+    });
+    
+    // Retorna true SÍNCRONO para avisar ao Chrome que responderemos depois
     return true;
   }
-);
+
+  // DEFAULT para qualquer outra chamada desconhecida
+  if (request.action !== 'TOGGLE_MONITORING' && request.action !== 'OBTER_ULTIMOS_CHAMADOS') {
+    sendResponse({ status: 'unknown_action' });
+  }
+});
 
 // QUANDO UMA ABA É ATIVADA
 chrome.tabs.onActivated.addListener(
@@ -635,7 +791,7 @@ chrome.tabs.onActivated.addListener(
         )
       ) {
 
-        console.log( '[Monitor SARP] Aba SARP ativada. Consultando...' );
+        log( '[Monitor SARP] Aba SARP ativada. Consultando...' );
 
         await executarMonitoramento();
       }
@@ -675,7 +831,7 @@ chrome.tabs.onUpdated.addListener(
       return;
     }
 
-    console.log( '[Monitor SARP] Página SARP carregada. Consultando...' );
+    log( '[Monitor SARP] Página SARP carregada. Consultando...' );
 
     await executarMonitoramento();
   }
@@ -683,7 +839,7 @@ chrome.tabs.onUpdated.addListener(
 
 // CONSULTA DE COLETA DE NUMEROS DE CHAMADOS
 async function salvarContadores() {
-  console.log( '[Monitor SARP] Atualizando contadores de chamados...' );
+  log( '[Monitor SARP] Atualizando contadores de chamados...' );
 
   try {
 
@@ -774,7 +930,7 @@ async function salvarContadores() {
       nSuporte
     });
 
-    console.log( '[Monitor SARP] Contadores atualizados:',
+    log( '[Monitor SARP] Contadores atualizados:',
       {
         nAbertos,
         nFechados,
@@ -791,11 +947,39 @@ async function salvarContadores() {
   }
 }
 
+// Limpa quando muda o target (TODOS / SUPORTE)
+chrome.storage.onChanged.addListener(
+  async (changes, areaName) => {
+
+    if (areaName !== 'sync') {
+      return;
+    }
+
+    if (changes.targetSelector) {
+
+      log( '[Monitor SARP] Tipo de chamado alterado. Limpando referência.');
+
+      await chrome.storage.session.remove('sarpMonitor');
+
+      // Recarrega somente a página principal de chamados
+      const tabs = await chrome.tabs.query({
+        url: 'https://sarp.saude.rn.gov.br/ti/chamados'
+      });
+
+      for (const tab of tabs) {
+        if (tab.id) {
+          chrome.tabs.reload(tab.id);
+        }
+      }
+    }
+  }
+);
+
 //
 //
 // FUNÇÃO DE TESTE: ENVIA TODOS OS CHAMADOS ABERTOS PARA O ntfy
 async function testeNtfy() {
-  console.log( '[Monitor SARP] ===== INÍCIO DO TESTE DE NOTIFICAÇÃO =====' );
+  log( '[Monitor SARP] ===== INÍCIO DO TESTE DE NOTIFICAÇÃO =====' );
   try {
     // CONSULTA O SARP REAL
     const resultado = await consultarChamados();
@@ -809,7 +993,7 @@ async function testeNtfy() {
         ? resultado.json.data
         : [];
 
-    console.log( `[Monitor SARP] ${registros.length} registros recebidos no JSON.`);
+    log( `[Monitor SARP] ${registros.length} registros recebidos no JSON.`);
     // FILTRA SOMENTE OS CHAMADOS ABERTOS
     const chamadosAbertos = registros.filter(
         chamado => {
@@ -821,19 +1005,19 @@ async function testeNtfy() {
         }
       );
 
-    console.log( `[Monitor SARP] ${chamadosAbertos.length} chamados ABERTOS encontrados para teste.` );
+    log( `[Monitor SARP] ${chamadosAbertos.length} chamados ABERTOS encontrados para teste.` );
     // CONVERTE PARA O MESMO FORMATO
     // UTILIZADO PELO MONITOR REAL
     const chamados = chamadosAbertos.map( extrairDadosChamado );
     // VERIFICA SE EXISTEM CHAMADOS
     if ( chamados.length === 0) {
-      console.log( '[Monitor SARP] Nenhum chamado aberto encontrado.');
+      log( '[Monitor SARP] Nenhum chamado aberto encontrado.');
       return;
     }
-    console.log( '[Monitor SARP] Chamados que serão enviados:', chamados);
+    log( '[Monitor SARP] Chamados que serão enviados:', chamados);
     // ENVIA TODOS COMO SE FOSSEM NOVOS
     await notificarNovosChamados( chamados );
-    console.log( '[Monitor SARP] ===== FIM DO TESTE DE NOTIFICAÇÃO =====');
+    log( '[Monitor SARP] ===== FIM DO TESTE DE NOTIFICAÇÃO =====');
   } catch (erro) {
     console.warn( '[Monitor SARP] Erro durante teste de notificação:', erro );
   }
