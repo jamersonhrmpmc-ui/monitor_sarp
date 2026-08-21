@@ -1,5 +1,5 @@
 // Monitor SARP - Background Service Worker (Manifest V3)
-const DEBUG = true;
+const DEBUG = false;
 function log(...args) {
   if (DEBUG) console.log(...args);
 }
