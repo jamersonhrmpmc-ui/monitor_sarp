@@ -12,7 +12,10 @@
     <header class="header">
         <div class="header-content">
             <div class="brand">
-                <div class="brand-icon">MS</div>
+                <div class="brand-icon">
+                    <img src="icons/icon48.png">
+                </div>
+
                 <div>
                     <h1>Monitor SARP</h1>
                     <p>Central de ajuda</p>
@@ -46,34 +49,40 @@
             <section id="ntfy" class="section">
                 <span class="section-label">NOTIFICAÇÕES</span>
                 <h2>🔔 Configuração do ntfy</h2>
-                <p>
-                    O <strong>Monitor SARP utiliza o ntfy</strong> para enviar
-                    notificações de novos chamados diretamente para o seu celular.
-                </p>
-
-                <p>
-                    A configuração é simples. Você precisa instalar o aplicativo
-                    ntfy, criar um tópico e informar a URL desse tópico nas
-                    configurações da extensão.
-                </p>
 
                 <h3>1. Instale o ntfy no celular</h3>
 
                 <p>
-                    Primeiro, instale o aplicativo <strong>ntfy</strong> no seu
-                    celular.
+                    Baixe o aplicativo oficial <strong>ntfy</strong> na Google Play Store.
+                    O ícone é este:
+                </p>
+
+                <p style="display: flex; align-items: center; gap: 16px; margin: 20px 0;">
+                    <img src="icons/ntfy-icon.png" alt="Ícone do aplicativo ntfy" width="64" height="64" style="border-radius: 14px; flex-shrink: 0;">
+                    <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener noreferrer" style="color: var(--accent); text-decoration: none; font-weight: 600;">
+                        📲 Baixar na Google Play Store →
+                    </a>
                 </p>
 
                 <p>
-                    Depois de instalar, abra o aplicativo e permita que ele
-                    envie notificações.
+                    Link direto:
+                    <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener noreferrer" style="color: var(--accent); word-break: break-all;">
+                        https://play.google.com/store/apps/details?id=io.heckel.ntfy
+                    </a>
+                </p>
+
+                <p>
+                    Depois de instalar, abra o app e <strong>permita que ele envie
+                    notificações</strong>. Sem essa permissão, as mensagens do Monitor
+                    SARP não vão aparecer.
                 </p>
 
                 <h3>2. Crie um tópico</h3>
 
                 <p>
-                    No aplicativo ntfy, crie um novo tópico para receber as
-                    notificações do Monitor SARP.
+                    No aplicativo ntfy, toque para adicionar / inscrever-se em um novo
+                    tópico. Esse tópico será o endereço exclusivo onde a extensão
+                    publicará as notificações.
                 </p>
 
                 <div class="alert alert-warning">
@@ -81,24 +90,57 @@
                     <strong>⚠️ Escolha um nome difícil de adivinhar</strong>
 
                     <p>
-                        O tópico funciona como um endereço para suas notificações.
-                        Por isso, evite nomes simples como
+                        O tópico funciona como um endereço público para suas notificações.
+                        Qualquer pessoa que souber o nome pode publicar mensagens nele.
+                        Por isso, <strong>evite nomes simples</strong> como
                         <code>sarp</code>, <code>monitor</code> ou
                         <code>notificacao</code>.
                     </p>
 
                     <p>
-                        Prefira um nome exclusivo para reduzir a possibilidade
-                        de outras pessoas descobrirem seu tópico.
+                        Prefira algo longo e aleatório, por exemplo:
+                        <code>sarp-a7k9m2x-q4zp</code>. Quanto mais único, mais seguro. Anote o nome para não esquecer
                     </p>
 
                 </div>
 
-                <h3>3. Copie a URL do tópico</h3>
+                <h3>3. Personalize o nome e o ícone do tópico (recomendado)</h3>
 
                 <p>
-                    Depois de criar o tópico, copie a
-                    <strong>URL completa</strong> dele.
+                    Ao criar o tópico, o ntfy costuma mostrar a URL completa
+                    (algo grande e difícil de ler) como nome na lista de inscritos.
+                    Dá para deixar bem mais limpo:
+                </p>
+
+                <ol>
+                    <li>
+                        Abra as <strong>configurações do tópico</strong> dentro do app ntfy
+                        (geralmente tocando no tópico e depois no ícone de configurações
+                        ou menu).
+                    </li>
+                    <li>
+                        Altere o <strong>nome de exibição</strong> para algo curto e
+                        reconhecível, por exemplo: <code>Monitor SARP</code> ou
+                        <code>Chamados SARP</code>.
+                    </li>
+                    <li>
+                        (Opcional) Defina um <strong>ícone</strong> personalizado para o
+                        tópico. Assim ele fica fácil de identificar entre outras
+                        notificações.
+                    </li>
+                </ol>
+
+                <p>
+                    Isso <strong>não altera a URL</strong> que a extensão usa — só muda
+                    como o tópico aparece na interface do app. A URL continua sendo a
+                    mesma que você vai copiar no próximo passo.
+                </p>
+
+                <h3>4. Copie a URL do tópico</h3>
+
+                <p>
+                    Ainda nas informações/configurações do tópico, copie a
+                    <strong>URL completa</strong>.
                 </p>
 
                 <p>
@@ -106,18 +148,19 @@
                 </p>
 
                 <div class="code-block">
-                    https://ntfy.sh/seu-topico
+                    https://ntfy.sh/seu-topico-dificil-de-adivinhar
                 </div>
 
                 <p>
                     Essa é a URL que o Monitor SARP utilizará para enviar
-                    as notificações.
+                    as notificações. Guarde-a com cuidado.
                 </p>
 
-                <h3>4. Configure a extensão</h3>
+                <h3>5. Configure a extensão</h3>
 
                 <p>
-                    Agora abra as configurações do Monitor SARP.
+                    Agora volte para o computador e abra as configurações do
+                    Monitor SARP:
                 </p>
 
                 <ol>
@@ -154,18 +197,20 @@
                         A partir desse momento, quando o Monitor SARP detectar
                         um novo chamado, ele enviará automaticamente uma
                         notificação para o tópico configurado no ntfy.
+                        Você deve vê-la no celular em poucos segundos. Faça um teste para confirmar que a URL está correta,
+                        se tudo estiver certo você receberá um alerta de teste concluído.
                     </p>
 
                 </div>
 
                 <div class="alert alert-warning">
 
-                    <strong>⚠️ Atenção</strong>
+                    <strong>⚠️ Atenção — segurança do tópico</strong>
 
                     <p>
                         Não compartilhe publicamente a URL do seu tópico.
                         Qualquer pessoa que conheça essa URL poderá publicar
-                        mensagens nele.
+                        mensagens nele (e você receberá as notificações).
                     </p>
 
                 </div>

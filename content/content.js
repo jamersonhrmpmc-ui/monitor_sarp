@@ -1,7 +1,6 @@
 // Monitor SARP - Content Script
 // Injetado na página web conforme regra do manifest.json
-
-const DEBUG = true;
+const DEBUG = false;
 
 function log(...args) {
   if (DEBUG) {
@@ -9,11 +8,7 @@ function log(...args) {
   }
 }
 
-log(
-  '[Monitor SARP] Content script ativo na página:',
-  window.location.href
-);
-
+log('[Monitor SARP] Content script ativo na página:', window.location.href);
 
 chrome.storage.sync.get(['isActive'], (data) => {
   const isActive = data.isActive !== false;
@@ -64,10 +59,7 @@ function carregarUltimosChamados() {
       // Verifica erro de comunicação
       if (chrome.runtime.lastError) {
 
-        console.warn(
-          '[Monitor SARP] Erro ao consultar últimas notificações:',
-          chrome.runtime.lastError.message
-        );
+        console.warn( '[Monitor SARP] Erro ao consultar últimas notificações:', chrome.runtime.lastError.message );
 
         atualizarUltimosChamados([], null);
         return;
@@ -75,18 +67,13 @@ function carregarUltimosChamados() {
 
       // Nenhuma resposta
       if (!resposta) {
-        console.warn(
-          '[Monitor SARP] Background não retornou dados das últimas notificações.'
-        );
+        console.warn( '[Monitor SARP] Background não retornou dados das últimas notificações.' );
 
         atualizarUltimosChamados([], null);
         return;
       }
 
-      log(
-        '[Monitor SARP] Últimas notificações recebidas:',
-        resposta
-      );
+      log( '[Monitor SARP] Últimas notificações recebidas:', resposta );
 
       // Garante que sempre teremos um array
       const chamados =
@@ -95,8 +82,7 @@ function carregarUltimosChamados() {
           : [];
 
       // Data já vem pronta do Background/session
-      const atualizadoEm =
-        resposta.atualizadoEm || null;
+      const atualizadoEm = resposta.atualizadoEm || null;
 
       atualizarUltimosChamados(
         chamados,
@@ -111,10 +97,7 @@ function carregarUltimosChamados() {
 chrome.runtime.onMessage.addListener(
   (request, sender, sendResponse) => {
 
-    log(
-      '[Monitor SARP] Mensagem recebida:',
-      request.action
-    );
+    log( '[Monitor SARP] Mensagem recebida:', request.action );
 
     // ATIVA / DESATIVA HUD
     if (request.action === 'TOGGLE_HUD') {
@@ -146,7 +129,7 @@ chrome.runtime.onMessage.addListener(
     // ATUALIZA HUD DE CHAMADOS
     if (request.action === 'ATUALIZAR_HUD_CHAMADOS') {
 
-      log( '[Monitor SARP] Background avisou que existem novos chamados.' );
+      log('[Monitor SARP] Background avisou que existem novos chamados.');
 
       // Pedimos novamente os dados ao Background.
       carregarUltimosChamados();
@@ -162,7 +145,6 @@ chrome.runtime.onMessage.addListener(
   }
 );
 
-
 // INJETA HUD PEQUENO "MONITOR SARP ATIVO"
 function injectMonitorHUD() {
 
@@ -177,13 +159,10 @@ function injectMonitorHUD() {
 
   hud.innerHTML = `
     <div class="monitor-hud-content">
-
       <span class="monitor-pulse"></span>
-
       <span class="monitor-text">
         <b>Monitor SARP Ativo</b>
       </span>
-
     </div>
   `;
 
@@ -192,31 +171,23 @@ function injectMonitorHUD() {
 
 // REMOVE HUD
 function removeMonitorHUD() {
-
-  const hud =
-    document.getElementById('monitor-sarp-hud');
+  const hud = document.getElementById('monitor-sarp-hud');
 
   if (hud) {
     hud.remove();
   }
-
 }
 
 // PERSONALIZAÇÃO DA PÁGINA DE CHAMADOS
-
 function personalizarPaginaChamados() {
 
-  const paginaChamados =
-    window.location.pathname === '/ti/chamados';
-
+  const paginaChamados = window.location.pathname === '/ti/chamados';
 
   if (!paginaChamados) {
     return;
   }
 
-  log(
-    '[Monitor SARP] Personalizando página de chamados...'
-  );
+  log( '[Monitor SARP] Personalizando página de chamados...' );
 
   // Esconde os cards originais
   const cardsOriginais =
@@ -224,30 +195,23 @@ function personalizarPaginaChamados() {
       '.card-body > .row.g-4.mb-4'
     );
 
-
   if (cardsOriginais) {
     cardsOriginais.style.display = 'none';
   }
 
   // Localiza "RESULTADOS POR PÁGINA"
-
   const seletorQuantidade =
     document.querySelector(
       '#DataTables_Table_0_length'
     );
-
 
   const informacoesTabela =
     document.querySelector(
       '#DataTables_Table_0_info'
     );
 
-
   if (!seletorQuantidade || !informacoesTabela) {
-
-    log(
-      '[Monitor SARP] Elementos do DataTables ainda não encontrados.'
-    );
+    log( '[Monitor SARP] Elementos do DataTables ainda não encontrados.' );
 
     return;
   }
@@ -258,26 +222,20 @@ function personalizarPaginaChamados() {
       'monitor-sarp-barra-tabela'
     );
 
-
   if (!barraInferior) {
 
-    barraInferior =
-      document.createElement('div');
+    barraInferior = document.createElement('div');
 
-    barraInferior.id =
-      'monitor-sarp-barra-tabela';
-
+    barraInferior.id = 'monitor-sarp-barra-tabela';
 
     const wrapper =
       document.querySelector(
         '#DataTables_Table_0_wrapper'
       );
 
-
     if (wrapper) {
       wrapper.appendChild(barraInferior);
     }
-
   }
 
   // Move "RESULTADOS POR PÁGINA"
@@ -322,46 +280,29 @@ function personalizarPaginaChamados() {
 
   }
 
-  log(
-    '[Monitor SARP] Interface da página personalizada.'
-  );
-
+  log( '[Monitor SARP] Interface da página personalizada.');
 }
 
 // ATUALIZA OS CONTADORES DO SARP
 async function atualizarContadoresPagina() {
-
   // Segurança
-  if (
-    window.location.pathname !== '/ti/chamados'
-  ) {
+  if ( window.location.pathname !== '/ti/chamados' ) {
     return;
   }
-
 
   try {
 
     // Pega os números salvos pelo Background
     const {
-
       nAbertos = 0,
-
       nAtendimentos = 0,
-
       nPendentes = 0,
-
       nFechados = 0
-
     } = await chrome.storage.sync.get([
-
       'nAbertos',
-
       'nAtendimentos',
-
       'nPendentes',
-
       'nFechados'
-
     ]);
 
     // Procura o painel
@@ -373,167 +314,106 @@ async function atualizarContadoresPagina() {
     // Cria o painel se não existir
     if (!painel) {
 
-      painel =
-        document.createElement('div');
-
-
-      painel.id =
-        'monitor-sarp-painel-superior';
-
+      painel = document.createElement('div');
+      painel.id = 'monitor-sarp-painel-superior';
 
       painel.innerHTML = `
-
-        <!-- ==================================================
-             ÁREA ESQUERDA
-             ================================================== -->
-
+        
+        <!-- ÁREA ESQUERDA -->
         <div class="monitor-sarp-area-info">
 
           <div class="monitor-sarp-info-titulo">
-
             <i class="bi bi-activity"></i>
-
             <span>
               Últimas notificações
             </span>
-
           </div>
 
-
           <div class="monitor-sarp-info-conteudo">
-
             <!--
               Conteúdo preenchido por
               atualizarUltimosChamados()
             -->
-
           </div>
 
         </div>
 
-
-        <!-- ==================================================
-             ÁREA DIREITA
-             ================================================== -->
-
+        <!--ÁREA DIREITA -->
         <div class="monitor-sarp-contadores">
 
-
           <!-- ABERTOS -->
-
           <div class="monitor-sarp-contador">
-
-            <div
-              class="monitor-sarp-contador-icone aberto"
-            >
+            <div class="monitor-sarp-contador-icone aberto">
               <i class="bi bi-ticket-perforated"></i>
             </div>
 
-
             <div class="monitor-sarp-contador-info">
-
               <span>
                 Abertos
               </span>
-
               <strong id="monitor-sarp-abertos">
                 0
               </strong>
-
             </div>
-
           </div>
 
-
           <!-- EM ATENDIMENTO -->
-
           <div class="monitor-sarp-contador">
-
-            <div
-              class="monitor-sarp-contador-icone atendimento"
-            >
+            <div class="monitor-sarp-contador-icone atendimento">
               <i class="bi bi-headset"></i>
             </div>
 
-
             <div class="monitor-sarp-contador-info">
-
               <span>
                 Em Atendimento
               </span>
-
               <strong id="monitor-sarp-atendimentos">
                 0
               </strong>
-
             </div>
-
           </div>
 
-
           <!-- PENDENTES -->
-
           <div class="monitor-sarp-contador">
-
-            <div
-              class="monitor-sarp-contador-icone pendente"
-            >
+            <div class="monitor-sarp-contador-icone pendente" >
               <i class="bi bi-ticket"></i>
             </div>
 
-
             <div class="monitor-sarp-contador-info">
-
               <span>
                 Pendentes
               </span>
-
               <strong id="monitor-sarp-pendentes">
                 0
               </strong>
-
             </div>
-
           </div>
 
-
           <!-- FECHADOS -->
-
           <div class="monitor-sarp-contador">
-
-            <div
-              class="monitor-sarp-contador-icone fechado"
-            >
+            <div class="monitor-sarp-contador-icone fechado" >
               <i class="bi bi-ticket-detailed"></i>
             </div>
 
-
             <div class="monitor-sarp-contador-info">
-
               <span>
                 Fechados
               </span>
-
               <strong id="monitor-sarp-fechados">
                 0
               </strong>
-
             </div>
-
           </div>
-
 
         </div>
 
       `;
 
       // Insere o painel no SARP
-
       const titulo =
         document.querySelector(
           '#main-content .card > .bg-primary'
         );
-
 
       if (titulo) {
 
@@ -544,9 +424,7 @@ async function atualizarContadoresPagina() {
 
       } else {
 
-        console.warn(
-          '[Monitor SARP] Título do painel não encontrado.'
-        );
+        console.warn( '[Monitor SARP] Título do painel não encontrado.' );
 
         return;
       }
@@ -560,51 +438,42 @@ async function atualizarContadoresPagina() {
         'monitor-sarp-abertos'
       );
 
-
     const elementoAtendimentos =
       document.getElementById(
         'monitor-sarp-atendimentos'
       );
-
 
     const elementoPendentes =
       document.getElementById(
         'monitor-sarp-pendentes'
       );
 
-
     const elementoFechados =
       document.getElementById(
         'monitor-sarp-fechados'
       );
-
 
     if (elementoAbertos) {
       elementoAbertos.textContent =
         nAbertos;
     }
 
-
     if (elementoAtendimentos) {
       elementoAtendimentos.textContent =
         nAtendimentos;
     }
-
 
     if (elementoPendentes) {
       elementoPendentes.textContent =
         nPendentes;
     }
 
-
     if (elementoFechados) {
       elementoFechados.textContent =
         nFechados;
     }
 
-
-    log(
-      '[Monitor SARP] Contadores atualizados:',
+    log( '[Monitor SARP] Contadores atualizados:',
       {
         nAbertos,
         nAtendimentos,
@@ -613,132 +482,85 @@ async function atualizarContadoresPagina() {
       }
     );
 
-
   } catch (erro) {
 
-    console.warn(
-      '[Monitor SARP] Erro ao atualizar os contadores:',
-      erro
-    );
+    console.warn( '[Monitor SARP] Erro ao atualizar os contadores:', erro);
 
   }
-
 }
 
 // ATUALIZA AS ÚLTIMAS NOTIFICAÇÕES
-
-function atualizarUltimosChamados(
-  chamados = [],
-  atualizadoEm = null
-) {
+function atualizarUltimosChamados( chamados = [], atualizadoEm = null ) {
 
   const area =
     document.querySelector(
       '.monitor-sarp-info-conteudo'
     );
 
-
-  // Se o painel ainda não existe, simplesmente sai.
-  // Não gera erro.
+  // Se o painel ainda não existe, simplesmente sai. Não gera erro.
   if (!area) {
-
-    log(
-      '[Monitor SARP] Área de últimas notificações ainda não existe.'
-    );
-
+    log( '[Monitor SARP] Área de últimas notificações ainda não existe.' );
     return;
   }
 
   // NÃO EXISTEM NOTIFICAÇÕES
-
   if (
     !Array.isArray(chamados) ||
     chamados.length === 0
   ) {
 
     area.innerHTML = `
-
       <div class="monitor-sarp-sem-chamados">
-
-        Nenhuma notificação enviada recentemente.
-
+        Nenhuma notificação enviada recentemente. Configure o ntfy, faça um teste e receba notificações
       </div>
-
     `;
 
     return;
   }
 
-  // EXISTEM NOTIFICAÇÕES
-
-  // A data vem pronta do Background/session.
-  // É mostrada UMA ÚNICA VEZ.
-  const dataExibicao =
-    atualizadoEm || '-';
-
+  // EXISTEM NOTIFICAÇÕES A data vem pronta do Background/session. É mostrada UMA ÚNICA VEZ.
+  const dataExibicao = atualizadoEm || '-';
 
   area.innerHTML = `
 
     <!-- DATA/HORA DA ÚLTIMA NOTIFICAÇÃO -->
-
     <div class="monitor-sarp-ultima-atualizacao">
-
       Última atualização:
       <strong>${dataExibicao}</strong>
-
     </div>
 
-
     <!-- LISTA DE CHAMADOS -->
-
     <div class="monitor-sarp-lista-chamados">
-
-      ${
-        chamados.map((chamado) => `
-
+      ${chamados.map((chamado) => `
           <div class="monitor-sarp-chamado">
-
             <div class="monitor-sarp-chamado-principal">
-
               <strong>
                 ${chamado.numero || '-'}
               </strong>
-
               <span>
                 ${chamado.nome || 'Não informado'}
               </span>
-
             </div>
 
-
             <div class="monitor-sarp-chamado-detalhes">
-
               <span>
                 ${chamado.servico || '-'}
               </span>
-
               <span>
                 ${chamado.prioridade || '-'}
               </span>
-
+              <span>
+                ${chamado.tipo || '-'}
+              </span>
             </div>
-
           </div>
-
         `).join('')
-      }
-
+    }
     </div>
-
   `;
-
 }
 
-
-// ============================================================
 // OBSERVA ALTERAÇÕES NO STORAGE SYNC
-// ============================================================
-
 chrome.storage.onChanged.addListener(
   (changes, areaName) => {
 
@@ -747,14 +569,10 @@ chrome.storage.onChanged.addListener(
       return;
     }
 
-
     // Só interessa a página de chamados
-    if (
-      window.location.pathname !== '/ti/chamados'
-    ) {
+    if ( window.location.pathname !== '/ti/chamados' ) {
       return;
     }
-
 
     // Verifica se algum contador mudou
     const contadorAlterado =
@@ -763,12 +581,9 @@ chrome.storage.onChanged.addListener(
       changes.nPendentes ||
       changes.nFechados;
 
-
     // Se mudou, atualiza
     if (contadorAlterado) {
-
       atualizarContadoresPagina();
-
     }
 
   }

@@ -302,7 +302,6 @@ async function processarChamados(json) {
   const idsAtuais = chamados.map( chamado => chamado.id );
 
   // Recupera referência anterior.
-  //const storage = await chrome.storage.local.get([ 'sarpMonitor' ]);
   const storage = await chrome.storage.session.get(['sarpMonitor']);
 
   const monitorAnterior = storage.sarpMonitor;
@@ -365,6 +364,80 @@ function formatarData(dataISO) {
   }
 }
 
+// EXTRAÇÃO DOS DADOS IMPORTANTES
+function extrairDadosChamado(c) {
+  const dados = {
+    // Identificação
+    id: c?.id ?? null,
+    numero: c?.numero ?? null,
+
+    // Status
+    statusId: c?.status_id ?? null,
+    status: c?.status?.name ?? null,
+
+    // Datas
+    criadoEm: c?.created_at ?? null,
+    atualizadoEm: c?.updated_at ?? null,
+    fechadoEm: c?.data_fechamento ?? null,
+
+    // Tipo
+    tipoId: c?.tipo_id ?? null,
+    tipo: c?.tipo?.name ?? null,
+
+    // Serviço
+    servicoId: c?.servico_id ?? null,
+    servico: c?.servico?.name ?? null,
+    tipoSolicitacao: c?.servico?.tipo_solicitacao ?? null,
+    tag_identificador: c?.servico?.categoria?.instancia?.name ?? null,
+
+    // Categoria / Instância
+    categoriaId: c?.servico?.categoria_id ?? null,
+    categoria: c?.servico?.categoria?.name ?? null,
+    instanciaId: c?.servico?.categoria?.instancia_id ?? null,
+    instancia: c?.servico?.categoria?.instancia?.name ?? null,
+
+    // Sistema
+    nomeSistema: c?.nome_sistema ?? null,
+
+    // Local
+    localId: c?.local_id ?? null,
+    setorId: c?.local?.setor_id ?? null,
+    setorSigla: c?.local?.setor?.sigla ?? null,
+    setor: c?.local?.setor?.name ?? null,
+
+    // Coordenação
+    coordenacaoId: c?.local?.setor?.coordenacao?.id ?? null,
+    coordenacao: c?.local?.setor?.coordenacao?.name ?? null,
+    coordenacaoSigla: c?.local?.setor?.coordenacao?.sigla ?? null,
+
+    // Unidade
+    unidadeId: c?.local?.setor?.coordenacao?.unidade?.id ?? null,
+    unidade: c?.local?.setor?.coordenacao?.unidade?.name ?? null,
+    unidadeSigla: c?.local?.setor?.coordenacao?.unidade?.sigla ?? null,
+    cidade: c?.local?.setor?.coordenacao?.unidade?.cidade ?? null,
+
+    // Prioridade + SLA
+    prioridadeId: c?.sla?.prioridade_id ?? null,
+    prioridade: c?.sla?.prioridade?.name ?? null,
+    slaId: c?.sla?.id ?? null,
+    slaNivel: c?.sla?.nivel_id ?? null,
+    slaTempoResposta: c?.sla?.tempo_resposta ?? null,
+    slaPrazoSolucao: c?.sla?.prazo_solucao ?? null,
+    slaDataLimiteResposta: c?.sla?.data_limite_resposta ?? null,
+    slaDataLimiteSolucao: c?.sla?.data_limite_solucao ?? null,
+
+    // Descrição bruta (do JSON)
+    descricao: c?.descricao ?? null,
+
+    // Novos campos (preenchidos depois)
+    solicitanteNome: null,
+    solicitanteTelefone: null,
+    descricaoFinal: null   // será "Olhar no SARP" ou a descrição real
+  };
+
+  return dados;
+}
+
 // ENVIA AS NOVAS NOTIFICAÇÕES PARA O ntfy
 async function notificarNovosChamados(chamados) {
   if (!chamados || chamados.length === 0) return;
@@ -374,7 +447,7 @@ async function notificarNovosChamados(chamados) {
   for (const chamado of chamados) {
     log('[Monitor SARP] Processando notificação:', chamado.numero);
 
-    const isSuporte = String(chamado.tipo || '').toUpperCase().includes('SUPORTE');
+    const isSuporte = String(chamado.tag_identificador || '').toUpperCase().includes('SUPORTE');
 
     // Busca nome + telefone + descrição
     const { nome, telefone, descricaoReal } = await buscarDadosSolicitante(chamado.id, isSuporte);
@@ -386,14 +459,16 @@ async function notificarNovosChamados(chamados) {
     // Monta a mensagem do ntfy
     const mensagem = `
 🚨 NOVO CHAMADO NO SARP
-
 📋 Chamado: ${chamado.numero}
+
 👤 Solicitante: ${nome || 'Não informado'}
 📞 Telefone: ${telefone || 'Não informado'}
-📌 Status: ${chamado.status || '-'}
-🛠️ Serviço: ${chamado.servico || '-'}
 🏢 Setor: ${chamado.setor || '-'}
+🖥️ TIPO: ${chamado.tag_identificador || '-'}
+
+🛠️ Serviço: ${chamado.servico || '-'}
 ⚠️ Prioridade: ${chamado.prioridade || '-'}
+📌 Status: ${chamado.status || '-'}
 📅 Data: ${formatarData(chamado.criadoEm)}
 
 📝 Descrição:
@@ -418,7 +493,8 @@ ${descricaoFinal}
       setor: chamado.setor || '-',
       telefone: telefone || null,
       servico: chamado.servico || null,
-      prioridade: chamado.prioridade || null
+      prioridade: chamado.prioridade || null,
+      tipo: chamado.tag_identificador || '-'
     });
   }
 
@@ -578,79 +654,6 @@ async function buscarDadosSolicitante(chamadoId, isSuporte = false) {
       descricaoReal: null
     };
   }
-}
-
-// EXTRAÇÃO DOS DADOS IMPORTANTES
-function extrairDadosChamado(c) {
-  const dados = {
-    // Identificação
-    id: c?.id ?? null,
-    numero: c?.numero ?? null,
-
-    // Status
-    statusId: c?.status_id ?? null,
-    status: c?.status?.name ?? null,
-
-    // Datas
-    criadoEm: c?.created_at ?? null,
-    atualizadoEm: c?.updated_at ?? null,
-    fechadoEm: c?.data_fechamento ?? null,
-
-    // Tipo
-    tipoId: c?.tipo_id ?? null,
-    tipo: c?.tipo?.name ?? null,
-
-    // Serviço
-    servicoId: c?.servico_id ?? null,
-    servico: c?.servico?.name ?? null,
-    tipoSolicitacao: c?.servico?.tipo_solicitacao ?? null,
-
-    // Categoria / Instância
-    categoriaId: c?.servico?.categoria_id ?? null,
-    categoria: c?.servico?.categoria?.name ?? null,
-    instanciaId: c?.servico?.categoria?.instancia_id ?? null,
-    instancia: c?.servico?.categoria?.instancia?.name ?? null,
-
-    // Sistema
-    nomeSistema: c?.nome_sistema ?? null,
-
-    // Local
-    localId: c?.local_id ?? null,
-    setorId: c?.local?.setor_id ?? null,
-    setorSigla: c?.local?.setor?.sigla ?? null,
-    setor: c?.local?.setor?.name ?? null,
-
-    // Coordenação
-    coordenacaoId: c?.local?.setor?.coordenacao?.id ?? null,
-    coordenacao: c?.local?.setor?.coordenacao?.name ?? null,
-    coordenacaoSigla: c?.local?.setor?.coordenacao?.sigla ?? null,
-
-    // Unidade
-    unidadeId: c?.local?.setor?.coordenacao?.unidade?.id ?? null,
-    unidade: c?.local?.setor?.coordenacao?.unidade?.name ?? null,
-    unidadeSigla: c?.local?.setor?.coordenacao?.unidade?.sigla ?? null,
-    cidade: c?.local?.setor?.coordenacao?.unidade?.cidade ?? null,
-
-    // Prioridade + SLA
-    prioridadeId: c?.sla?.prioridade_id ?? null,
-    prioridade: c?.sla?.prioridade?.name ?? null,
-    slaId: c?.sla?.id ?? null,
-    slaNivel: c?.sla?.nivel_id ?? null,
-    slaTempoResposta: c?.sla?.tempo_resposta ?? null,
-    slaPrazoSolucao: c?.sla?.prazo_solucao ?? null,
-    slaDataLimiteResposta: c?.sla?.data_limite_resposta ?? null,
-    slaDataLimiteSolucao: c?.sla?.data_limite_solucao ?? null,
-
-    // Descrição bruta (do JSON)
-    descricao: c?.descricao ?? null,
-
-    // Novos campos (preenchidos depois)
-    solicitanteNome: null,
-    solicitanteTelefone: null,
-    descricaoFinal: null   // será "Olhar no SARP" ou a descrição real
-  };
-
-  return dados;
 }
 
 // SALVAR DADOS NO STORAGE

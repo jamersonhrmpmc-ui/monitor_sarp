@@ -1,86 +1,16 @@
 // Monitor SARP - Popup Controller
-
 document.addEventListener('DOMContentLoaded', async () => {
-
   const toggleMonitoring = document.getElementById('toggleMonitoring');
   const statusText = document.getElementById('statusText');
   const currentDomain = document.getElementById('currentDomain');
 
   const helpNoticeLink = document.getElementById('helpNoticeLink');
   const optionsNoticeLink = document.getElementById('optionsNoticeLink');
-
+  const testarntfy = document.getElementById('testarntfy');
+  
   // Botões do Header
   const btnOptions = document.getElementById('btnOptions');
   const btnHelp = document.getElementById('btnHelp');
-
-  // Verifica se a aba atual é o SARP
-  // const unavailableMessage = document.getElementById('unavailableMessage');
-  // const mainContent = document.getElementById('mainContent');
-
-  // try {
-
-  //   const [tab] = await chrome.tabs.query({
-  //     active: true,
-  //     currentWindow: true
-  //   });
-
-  //   const isSarp = tab?.url?.startsWith(
-  //     'https://sarp.saude.rn.gov.br/'
-  //   );
-
-  //   if (!isSarp) {
-
-  //     mainContent.style.display = 'none';
-  //     unavailableMessage.style.display = 'flex';
-
-  //     return;
-  //   }
-
-  // } catch (err) {
-
-  //   console.error(
-  //     'Erro ao verificar aba atual:',
-  //     err
-  //   );
-
-  //   mainContent.style.display = 'none';
-  //   unavailableMessage.style.display = 'flex';
-
-  //   return;
-  // }
-
-
-  // Obter aba ativa atual
-  // try {
-
-  //   const [tab] = await chrome.tabs.query({
-  //     active: true,
-  //     currentWindow: true
-  //   });
-
-  //   if (tab && tab.url) {
-
-  //     try {
-
-  //       const urlObj = new URL(tab.url);
-
-  //       currentDomain.textContent =
-  //         urlObj.hostname ||
-  //         tab.url.substring(0, 25);
-
-  //     } catch {
-
-  //       currentDomain.textContent =
-  //         tab.url.substring(0, 25);
-
-  //     }
-  //   }
-
-  // } catch (err) {
-
-  //   console.warn( 'Erro ao obter aba ativa:', err );
-  // }
-
 
   // Carregar estado salvo via chrome.storage.sync
   chrome.storage.sync.get(
@@ -144,7 +74,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   );
 
-
   // Abrir tela de Opções / Configurações da Extensão
   btnOptions.addEventListener(
     'click',
@@ -166,7 +95,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     }
   );
-
 
   // Abrir página de Ajuda
   btnHelp.addEventListener(

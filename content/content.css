@@ -1,153 +1,95 @@
-/* ============================================================
-   MONITOR SARP - HUD PEQUENO
-   ============================================================ */
-
+/* MONITOR SARP - HUD PEQUENO */
 #monitor-sarp-hud {
-
     position: fixed;
-
     top: 10px;
     left: 50%;
-
     z-index: 9999999;
-
     background: #0f172a;
     color: #f8fafc;
-
     border: 1px solid #334155;
-
     border-radius: 20px;
-
     padding: 6px 12px;
-
     font-family:
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
         Roboto,
         sans-serif;
-
     font-size: 11px;
-
     box-shadow:
         0 4px 12px rgba(0, 0, 0, 0.3);
-
     pointer-events: auto;
-
     user-select: none;
 }
 
-
 /* CONTEÚDO DO HUD */
-
 .monitor-hud-content {
-
     display: flex;
-
     align-items: center;
-
     gap: 6px;
-
 }
-
 
 /* BOLINHA */
-
 .monitor-pulse {
-
     width: 8px;
     height: 8px;
-
     background: #10b981;
-
     border-radius: 50%;
-
     box-shadow:
         0 0 6px #10b981;
-
     animation:
         monitorPulseAnim 1.5s infinite;
-
 }
-
 
 /* TEXTO */
-
 .monitor-text {
-
     color: #5a7bf2;
-
 }
 
-
 /* ANIMAÇÃO */
-
 @keyframes monitorPulseAnim {
-
     0% {
         opacity: 1;
         transform: scale(1);
     }
-
     50% {
         opacity: 0.2;
         transform: scale(1.2);
     }
-
     100% {
         opacity: 1;
         transform: scale(1);
     }
-
 }
 
-
-/* ============================================================
-   MONITOR SARP - PAINEL SUPERIOR
-   ============================================================ */
-
+/* MONITOR SARP - PAINEL SUPERIOR*/
 #monitor-sarp-painel-superior {
-
     display: flex;
-
     align-items: stretch;
-
     gap: 10px;
-
     width: 100%;
-
     margin: 8px 0 0 10px;
-
     padding: 0;
-
     user-select: none;
-
 }
 
-
-/* ============================================================
-   ÁREA ESQUERDA - ÚLTIMAS NOTIFICAÇÕES
-   ============================================================ */
+/* ÁREA ESQUERDA - ÚLTIMAS NOTIFICAÇÕES */
 .monitor-sarp-area-info {
     flex: 1;
-    height: 110px;      /* Altura exata solicitada */
-    min-height: 110px;
-    max-height: 110px;
-    padding: 10px 14px; /* Padding levemente reduzido para ganhar área útil */
+    height: 120px;
+    min-height: 120px;
+    max-height: 120px;
+    padding: 10px 14px;
     background: #1e1e2d;
     border: 1px solid #343a40;
     border-radius: 10px;
     color: #dee2e6;
     box-sizing: border-box;
-
-    /* A mágica do Flexbox para evitar cortes */
     display: flex;
     flex-direction: column;
 }
 
-/* ============================================================
-   TÍTULO
-   ============================================================ */
+/* TÍTULO */
 .monitor-sarp-info-titulo {
     display: flex;
     align-items: center;
@@ -163,17 +105,11 @@
     color: #0d6efd;
 }
 
-/* ============================================================
-   ÁREA INTERNA DAS NOTIFICAÇÕES
-   ============================================================ */
+/* ÁREA INTERNA DAS NOTIFICAÇÕES*/
 .monitor-sarp-info-conteudo {
     margin-top: 8px;
-    
-    /* Ocupa perfeitamente o resto do espaço dentro dos 110px */
     flex: 1;
-    min-height: 0; /* Regra de ouro para o scroll funcionar dentro de um Flexbox */
-    
-    /* Removemos as propriedades antigas de height fixo daqui */
+    min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 5px;
@@ -181,536 +117,279 @@
 }
 
 /* Scroll */
-
 .monitor-sarp-info-conteudo::-webkit-scrollbar {
-
     width: 5px;
-
 }
-
 
 .monitor-sarp-info-conteudo::-webkit-scrollbar-track {
-
     background: transparent;
-
 }
-
 
 .monitor-sarp-info-conteudo::-webkit-scrollbar-thumb {
-
     background: #495057;
-
     border-radius: 10px;
-
 }
 
-
-/* ============================================================
-   DATA DA ÚLTIMA NOTIFICAÇÃO
-   ============================================================ */
-
+/* DATA DA ÚLTIMA NOTIFICAÇÃO */
 .monitor-sarp-ultima-atualizacao {
-
     font-size: 10px;
-
     color: #8c96a5;
-
     margin-bottom: 6px;
-
     line-height: 1.2;
-
 }
-
 
 .monitor-sarp-ultima-atualizacao strong {
-
     color: #adb5bd;
-
     font-weight: 600;
-
 }
 
-
-/* ============================================================
-   LISTA DE CHAMADOS
-   ============================================================ */
-
+/* LISTA DE CHAMADOS */
 .monitor-sarp-lista-chamados {
-
     display: flex;
-
     flex-direction: column;
-
     gap: 5px;
-
 }
 
-
-/* ============================================================
-   CADA CHAMADO
-   ============================================================ */
-
+/* CADA CHAMADO */
 .monitor-sarp-chamado {
-
     padding: 6px 8px;
-
     background: #252536;
-
     border: 1px solid #343a40;
-
     border-radius: 6px;
-
     box-sizing: border-box;
-
 }
 
-
-/* ============================================================
-   LINHA PRINCIPAL
-   ============================================================ */
-
+/*LINHA PRINCIPAL */
 .monitor-sarp-chamado-principal {
-
     display: flex;
-
     align-items: center;
-
     gap: 8px;
-
     min-width: 0;
-
 }
-
 
 .monitor-sarp-chamado-principal strong {
-
     font-size: 11px;
-
     color: #6ea8fe;
-
     white-space: nowrap;
-
 }
-
 
 .monitor-sarp-chamado-principal span {
-
     font-size: 11px;
-
     color: #dee2e6;
-
     white-space: nowrap;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
-
     min-width: 0;
-
 }
 
-
-/* ============================================================
-   DETALHES
-   ============================================================ */
-
+/*DETALHES*/
 .monitor-sarp-chamado-detalhes {
-
     display: flex;
-
     gap: 12px;
-
     margin-top: 2px;
-
     font-size: 9px;
-
     color: #8c96a5;
-
 }
-
 
 .monitor-sarp-chamado-detalhes span {
-
     white-space: nowrap;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
-
     min-width: 0;
-
 }
 
-
-/* ============================================================
-   SEM NOTIFICAÇÕES
-   ============================================================ */
-
+/*SEM NOTIFICAÇÕES */
 .monitor-sarp-sem-chamados {
-
     display: flex;
-
     align-items: center;
-
     height: 100%;
-
+    font-weight: 700;
     font-size: 11px;
-
     color: #8c96a5;
-
 }
 
-
-/* ============================================================
-   BLOCO DOS CONTADORES
-   ============================================================ */
-
+/* BLOCO DOS CONTADORES */
 .monitor-sarp-contadores {
-
     width: 330px;
-
     display: grid;
-
     grid-template-columns: repeat(2, 1fr);
-
     gap: 8px;
-
     margin-right: 20px;
-
     user-select: none;
-
 }
 
-
-/* ============================================================
-   CADA CONTADOR
-   ============================================================ */
-
+/* CADA CONTADOR*/
 .monitor-sarp-contador {
-
     display: flex;
-
     align-items: center;
-
     gap: 9px;
-
     padding: 8px 10px;
-
     background: #1e1e2d;
-
     border: 1px solid #343a40;
-
     border-radius: 9px;
-
     transition:
         background 0.15s ease,
         border-color 0.15s ease,
         transform 0.15s ease;
-
 }
-
 
 .monitor-sarp-contador:hover {
-
     background: #292e33;
-
     border-color: #495057;
-
     transform: translateY(-1px);
-
 }
 
-
-/* ============================================================
-   ÍCONES
-   ============================================================ */
-
+/*ÍCONES*/
 .monitor-sarp-contador-icone {
-
     width: 30px;
     height: 30px;
-
     min-width: 30px;
-
     display: flex;
-
     align-items: center;
     justify-content: center;
-
     border-radius: 7px;
-
     font-size: 15px;
-
 }
 
-
-/* ============================================================
-   INFORMAÇÕES
-   ============================================================ */
-
+/* INFORMAÇÕES*/
 .monitor-sarp-contador-info {
-
     display: flex;
-
     flex-direction: column;
-
     line-height: 1.1;
-
 }
-
 
 .monitor-sarp-contador-info span {
-
+    font-weight: 700;
     font-size: 10px;
-
     color: #adb5bd;
-
     white-space: nowrap;
-
 }
-
 
 .monitor-sarp-contador-info strong {
-
     margin-top: 3px;
-
     font-size: 17px;
-
     color: #f8f9fa;
-
 }
 
-
-/* ============================================================
-   CORES DOS ÍCONES
-   ============================================================ */
-
+/* CORES DOS ÍCONES*/
 .monitor-sarp-contador-icone.aberto {
-
     background:
         rgba(25, 135, 84, 0.18);
-
     color: #20c997;
-
 }
-
 
 .monitor-sarp-contador-icone.atendimento {
-
-    background:
-        rgba(255, 193, 7, 0.15);
-
+    background:rgba(255, 193, 7, 0.15);
     color: #ffc107;
-
 }
-
 
 .monitor-sarp-contador-icone.pendente {
-
-    background:
-        rgba(13, 110, 253, 0.15);
-
+    background:rgba(13, 110, 253, 0.15);
     color: #6ea8fe;
-
 }
-
 
 .monitor-sarp-contador-icone.fechado {
-
-    background:
-        rgba(220, 53, 69, 0.15);
-
+    background:rgba(220, 53, 69, 0.15);
     color: #ff6b7a;
-
 }
 
-
-/* ============================================================
-   REDUZ ESPAÇOS DA ÁREA ORIGINAL
-   ============================================================ */
-
+/* REDUZ ESPAÇOS DA ÁREA ORIGINAL*/
 /* Remove o espaço dos cards antigos */
-
 #main-content .card-body > .d-none.row {
-
     display: none !important;
-
 }
-
 
 /* Reduz espaço antes da tabela */
-
 #main-content .card-body {
-
     padding-top: 6px !important;
-
 }
-
 
 /* Remove margens extras */
-
 #main-content .card-body > .row {
-
     margin-top: 0 !important;
-
 }
-
 
 /* Card da tabela */
-
 #main-content .card-body > .row > .card {
-
     margin-top: 0 !important;
-
 }
-
 
 /* Tabela */
-
 #DataTables_Table_0_wrapper {
-
     margin-top: 0 !important;
-
 }
 
-
-/* ============================================================
-   BARRA INFERIOR DA TABELA
-   ============================================================ */
-
+/*BARRA INFERIOR DA TABELA*/
 #monitor-sarp-barra-tabela {
-
     display: flex !important;
-
     align-items: center;
-
     justify-content: space-between;
-
     gap: 15px;
-
     flex-wrap: wrap;
-
     width: 100%;
-
     padding: 12px 4px 4px;
-
     margin-top: 8px;
-
     border-top: 1px solid #e9ecef;
-
 }
 
-
-/* ============================================================
-   INFORMAÇÃO DE REGISTROS
-   ============================================================ */
-
+/* INFORMAÇÃO DE REGISTROS */
 #DataTables_Table_0_info {
-
     margin: 0 !important;
-
     font-size: 13px;
-
     color: #6c757d;
-
 }
 
-
-/* ============================================================
-   SELETOR DE QUANTIDADE
-   ============================================================ */
-
+/* SELETOR DE QUANTIDADE*/
 #DataTables_Table_0_length {
-
     margin: 0 !important;
-
     font-size: 13px;
-
     color: #6c757d;
-
 }
-
 
 #DataTables_Table_0_length label {
-
     display: flex;
-
     align-items: center;
-
     gap: 7px;
-
     margin: 0;
-
 }
-
 
 #DataTables_Table_0_length select {
-
     width: auto;
-
     min-width: 65px;
-
     margin: 0;
-
 }
 
-
-/* ============================================================
-   PAGINAÇÃO
-   ============================================================ */
-
+/* PAGINAÇÃO */
 #DataTables_Table_0_paginate {
-
     margin: 0 !important;
-
 }
-
 
 #DataTables_Table_0_paginate .pagination {
-
     margin: 0;
-
 }
-
 
 #DataTables_Table_0_paginate .page-link {
-
     font-size: 13px;
-
     padding: 5px 10px;
-
 }
 
-
-/* ============================================================
-   RESPONSIVO
-   ============================================================ */
-
+/* RESPONSIVO*/
 @media (max-width: 768px) {
-
     #monitor-sarp-painel-superior {
-
         flex-direction: column;
-
     }
-
-
     .monitor-sarp-contadores {
-
         width: 100%;
-
     }
-
 }
-
 
 @media (max-width: 480px) {
     .monitor-sarp-contadores {
         grid-template-columns: 1fr;
     }
     .monitor-sarp-area-info {
-        height: 110px;
-        min-height: 110px;
-        max-height: 110px;
+        height: 120px;
+        min-height: 120px;
+        max-height: 120px;
     }
 }
