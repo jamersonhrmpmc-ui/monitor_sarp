@@ -140,6 +140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (!ntfyUrl) {
         console.warn('[Monitor SARP] URL do ntfy não configurada');
+        alert('Configure a URL do ntfy antes de fazer o teste.');
         return;
       }
 
@@ -149,12 +150,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (sucesso) {
         console.log('[Monitor SARP] Teste enviado com sucesso para o ntfy');
+        alert('Teste do ntfy enviado com sucesso!');
       } else {
         console.warn('[Monitor SARP] Falha ao enviar o teste');
+        alert('Não foi possível enviar o teste do ntfy. Verifique a URL configurada.');
       }
 
     } catch (erro) {
       console.warn('[Monitor SARP] Erro durante o teste:', erro);
+      alert('Ocorreu um erro ao testar o ntfy. Verifique a URL configurada.');
     }
 
     console.log('[Monitor SARP] ===== FIM DO TESTE =====');

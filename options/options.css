@@ -102,16 +102,6 @@ body {
   display: block;
 }
 
-.checkbox-group label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: #cbd5e1;
-  margin-bottom: 8px;
-  cursor: pointer;
-}
-
 .actions {
   margin-top: 24px;
   display: flex;

@@ -13,55 +13,52 @@
 
 ## 🔔 Configuração do ntfy (Notificações)
 
-Para receber as notificações de novos chamados no celular, o **Monitor SARP utiliza o ntfy**.
+O **Monitor SARP utiliza o ntfy** para enviar notificações de novos chamados ao celular.
 
-O ntfy é um serviço de notificações que permite receber mensagens diretamente no celular por meio de tópicos.
+### 1. Instale o ntfy no celular
 
-### 1. Instalar o ntfy
+Baixe o aplicativo oficial [ntfy na Google Play Store](https://play.google.com/store/apps/details?id=io.heckel.ntfy), abra-o e permita o envio de notificações quando solicitado.
 
-Instale o aplicativo **ntfy** no seu celular.
+### 2. Crie um tópico
 
-Depois de instalar, abra o aplicativo e permita as notificações quando solicitado.
+No aplicativo ntfy, adicione ou inscreva-se em um novo tópico. Escolha um nome longo, exclusivo e difícil de adivinhar, por exemplo:
 
-### 2. Criar um tópico
+`sarp-a7k9m2x-q4zp`
 
-1. Acesse o ntfy pelo aplicativo ou pelo site.
-2. Crie um novo tópico para o Monitor SARP.
-3. Escolha um nome exclusivo para o tópico.
+O tópico funciona como um endereço público: qualquer pessoa que souber o nome poderá publicar mensagens nele. Evite nomes simples como `sarp`, `monitor` ou `notificacao`.
 
-> **Importante:** O nome do tópico deve ser exclusivo. Evite utilizar nomes fáceis de adivinhar.
+### 3. Personalize o tópico (recomendado)
 
-### 3. Copiar a URL do tópico
+Nas configurações do tópico, altere o nome de exibição para algo fácil de reconhecer, como `Monitor SARP` ou `Chamados SARP`. Também é possível definir um ícone personalizado.
 
-Depois de criar o tópico, copie a **URL completa** dele.
+Essa personalização não altera a URL do tópico.
 
-Ela terá um formato semelhante a:
+### 4. Copie a URL completa
 
-`https://ntfy.sh/seu-topico`
+Nas informações ou configurações do tópico, copie a URL completa. Ela terá um formato semelhante a:
 
-Essa é a URL que será utilizada pela extensão para enviar as notificações.
+`https://ntfy.sh/seu-topico-dificil-de-adivinhar`
 
-### 4. Configurar na Extensão
+Não compartilhe essa URL publicamente: quem a conhecer poderá publicar mensagens no seu tópico.
 
-1. Clique com o botão direito no ícone da extensão **Monitor SARP**.
-2. Selecione **Opções**.
-3. No campo destinado às notificações, cole a **URL completa do seu tópico ntfy**.
-4. Salve as configurações.
+### 5. Configure a extensão
 
-Pronto!
+1. Abra o popup do **Monitor SARP**.
+2. Clique no ícone de **Configurações ⚙**.
+3. Localize o campo **URL ntfy**.
+4. Cole a URL completa do tópico.
+5. Clique em **Salvar Preferências**.
 
-A partir de agora, quando o Monitor SARP detectar novos chamados, as notificações serão enviadas automaticamente para o seu celular através do ntfy.
+Depois de salvar, volte ao popup e clique em **TESTAR NTFY**. Se a URL estiver correta, você receberá no celular a mensagem de teste `TESTE CONCLUIDO`.
 
 ### 📱 Configuração recomendada no celular
 
-Para garantir que as notificações sejam recebidas mesmo com a tela bloqueada:
+Para receber notificações com a tela bloqueada:
 
-- Permita as notificações do ntfy.
-- Permita notificações na tela de bloqueio.
-- Permita vibração.
-- Permita notificações em segundo plano.
-- Ative o **Instant Delivery** no ntfy, caso esteja disponível no seu dispositivo.
-- No Android/MIUI, evite restringir o uso de bateria do ntfy em segundo plano.
+- Permita as notificações do ntfy e na tela de bloqueio.
+- Permita vibração e funcionamento em segundo plano.
+- Ative o **Instant Delivery** no ntfy, caso esteja disponível.
+- Evite restrições de bateria para o ntfy, especialmente em aparelhos Xiaomi, Samsung, Android ou MIUI.
 
 ---
 
