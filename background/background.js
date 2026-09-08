@@ -19,33 +19,41 @@ async function restoreBadge() {
 restoreBadge();
 
 // EXTENSÃO INSTALADA ou ATUALIZADA
-chrome.runtime.onInstalled.addListener( (details) => {
-    log( '[Monitor SARP] Extensão instalada/atualizada:', details.reason );
+chrome.runtime.onInstalled.addListener((details) => {
+    log('[Monitor SARP] Extensão instalada/atualizada:', details.reason);
 
-    // Sempre começa OFF.
-    chrome.storage.sync.set({
-      isActive: false,
-      targetSelector: 'TODOS',
-      nAbertos: 0,
-      nFechados: 0,
-      nAtendimentos: 0,
-      nPendentes: 0,
-      nSuporte: 0,
-      ntfyURL: '',
-    });
+    // 1. Se for uma instalação nova, define os valores padrões do zero
+    if (details.reason === 'install') {
+        chrome.storage.sync.set({
+            isActive: false,
+            targetSelector: 'TODOS',
+            nAbertos: 0,
+            nFechados: 0,
+            nAtendimentos: 0,
+            nPendentes: 0,
+            nSuporte: 0,
+            ntfyURL: '',
+        });
+        
+        chrome.action.setBadgeText({ text: 'OFF' });
+        chrome.action.setBadgeBackgroundColor({ color: '#64748b' });
+    } 
+    // 2. Se for apenas uma atualização, preserva os dados e garante que o badge reflita o estado atual
+    else if (details.reason === 'update') {
+        // Verifica o estado atual de 'isActive' para não quebrar o Badge
+        chrome.storage.sync.get(['isActive'], (resultado) => {
+            const status = resultado.isActive ? 'ON' : 'OFF';
+            const cor = resultado.isActive ? '#2ecc71' : '#64748b'; // Ajuste as cores se necessário
+            
+            chrome.action.setBadgeText({ text: status });
+            chrome.action.setBadgeBackgroundColor({ color: cor });
+        });
+    }
 
-    // Limpa referência anterior do sessionStorage
+    // Limpa referência anterior do sessionStorage (Independente de ser install ou update)
     chrome.storage.session.remove('sarpMonitor');
+});
 
-    // Badge inicial.
-    chrome.action.setBadgeText({ text: 'OFF' });
-    chrome.action.setBadgeBackgroundColor({ color: '#64748b' });
-
-    // Cria o alarme de 30 segundos.
-    // chrome.alarms.create( ALARM_NAME, { periodInMinutes: 0.5 } );
-    // log( '[Monitor SARP] Alarme criado.' );
-  }
-);
 
 // FUNÇÃO PRINCIPAL DO MONITOR
 async function executarMonitoramento() {
