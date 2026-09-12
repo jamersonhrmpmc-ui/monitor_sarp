@@ -1,5 +1,5 @@
 // Monitor SARP - Background Service Worker (Manifest V3)
-const DEBUG = false;
+const DEBUG = true;
 function log(...args) {
   if (DEBUG) console.log(...args);
 }
@@ -104,12 +104,44 @@ async function executarMonitoramento() {
 
     await salvarContadores();
 
+    // ===== VOLTOU A FUNCIONAR =====
+    const { monitorWasOffline = false } = await chrome.storage.session.get('monitorWasOffline');
+
+    if (monitorWasOffline) {
+      // Limpa o flag
+      await chrome.storage.session.set({ monitorWasOffline: false });
+
+      // Recarrega as abas do SARP (mesmo se estiver na tela de erro do Chrome)
+      const tabsOnline = await chrome.tabs.query({ url: 'https://sarp.saude.rn.gov.br/*' });
+      for (const tab of tabsOnline) {
+        if (tab.id) {
+          // Tenta avisar o content (se existir)
+          chrome.tabs.sendMessage(tab.id, { action: 'MONITOR_ONLINE' }).catch(() => {});
+          // Força o reload da aba (resolve a tela de erro do navegador)
+          chrome.tabs.reload(tab.id);
+        }
+      }
+    }
+
   } catch (erro) {
 
     console.warn( '[Monitor SARP] Erro durante monitoramento:', erro );
 
     chrome.action.setBadgeText({ text: 'ERRO' });
     chrome.action.setBadgeBackgroundColor({ color: '#f59e0b' });
+
+    // Marca que está offline
+    await chrome.storage.session.set({ monitorWasOffline: true });
+
+    // Avisa o content para mostrar o overlay (SEM pedir reload)
+    const tabsOffline = await chrome.tabs.query({ url: 'https://sarp.saude.rn.gov.br/*' });
+    for (const tab of tabsOffline) {
+      if (tab.id) {
+        chrome.tabs.sendMessage(tab.id, {
+          action: 'MONITOR_OFFLINE'
+        }).catch(() => {});
+      }
+    }
   }
 }
 
@@ -1034,4 +1066,3 @@ async function testeNtfy() {
   }
 }
 globalThis.testeNtfy = testeNtfy;
-

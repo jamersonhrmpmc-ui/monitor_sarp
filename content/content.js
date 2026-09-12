@@ -141,6 +141,20 @@ chrome.runtime.onMessage.addListener(
       return true;
     }
 
+   if (request.action === 'MONITOR_OFFLINE') {
+      mostrarAvisoOffline();
+      sendResponse({ success: true });
+      return true;
+    }
+
+    if (request.action === 'MONITOR_ONLINE') {
+      // Só fecha o aviso se estiver na tela
+      // (o reload da aba já é feito pelo background)
+      fecharAvisoOffline(false);
+      sendResponse({ success: true });
+      return true;
+    }
+
     return true;
   }
 );
@@ -588,6 +602,145 @@ chrome.storage.onChanged.addListener(
 
   }
 );
+
+// =====================================================
+// AVISO DE OFFLINE (consulta falhou) — SEM RELOAD
+// =====================================================
+const OFFLINE_ID = 'monitor-sarp-offline-overlay';
+
+function mostrarAvisoOffline() {
+  // Já existe? Não cria outro
+  if (document.getElementById(OFFLINE_ID)) {
+    return;
+  }
+
+  // Injeta o CSS do overlay (só uma vez)
+  if (!document.getElementById('monitor-sarp-offline-style')) {
+    const style = document.createElement('style');
+    style.id = 'monitor-sarp-offline-style';
+    style.textContent = `
+#monitor-sarp-offline-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+  font-family: inherit;
+}
+
+.monitor-sarp-offline-box {
+  width: min(480px, 92vw);
+  padding: 32px 28px;
+  border-radius: 16px;
+  background: var(--monitor-bg, #1e293b);
+  color: var(--monitor-text, #e2e8f0);
+  border: 1px solid var(--monitor-border, #334155);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+
+.monitor-sarp-offline-icon {
+  font-size: 48px;
+  color: #f59e0b;
+  margin-bottom: 12px;
+}
+
+.monitor-sarp-offline-box h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--monitor-text-strong, #f8fafc);
+}
+
+.monitor-sarp-offline-box p {
+  margin: 0 0 10px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--monitor-text, #cbd5e1);
+}
+
+.monitor-sarp-offline-sub {
+  font-size: 13px !important;
+  opacity: 0.85;
+  margin-bottom: 22px !important;
+}
+
+#monitor-sarp-offline-fechar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 8px;
+  background: #f59e0b;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+#monitor-sarp-offline-fechar:hover {
+  background: #fbbf24;
+  transform: translateY(-1px);
+}
+
+[data-bs-theme="light"] .monitor-sarp-offline-box,
+html:not([data-bs-theme="dark"]) .monitor-sarp-offline-box {
+  background: var(--monitor-bg, #ffffff);
+  color: var(--monitor-text, #1e293b);
+  border-color: var(--monitor-border, #e2e8f0);
+}
+    `;
+    document.head.appendChild(style);
+  }
+
+  const overlay = document.createElement('div');
+  overlay.id = OFFLINE_ID;
+  overlay.innerHTML = `
+    <div class="monitor-sarp-offline-box">
+      <div class="monitor-sarp-offline-icon">
+        <i class="bi bi-wifi-off"></i>
+      </div>
+      <h2>Monitor SARP — OFFLINE</h2>
+      <p>
+        Não foi possível consultar o SARP.<br>
+        A conexão caiu ou o servidor está indisponível.
+      </p>
+      <p class="monitor-sarp-offline-sub">
+        O monitor tentará novamente em breve.<br>
+        Você pode fechar este aviso, mas ele reaparecerá se a falha continuar.
+      </p>
+      <button type="button" id="monitor-sarp-offline-fechar">
+        Fechar aviso
+      </button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  // Botão de fechar manual — só fecha, NÃO recarrega
+  document.getElementById('monitor-sarp-offline-fechar')
+    .addEventListener('click', () => {
+      fecharAvisoOffline(false);
+    });
+}
+
+function fecharAvisoOffline(recarregar = false) {
+  const overlay = document.getElementById(OFFLINE_ID);
+  if (overlay) {
+    overlay.remove();
+  }
+
+  // Neste fluxo o reload é feito pelo background.
+  // Mantemos o parâmetro só por segurança, mas não usamos mais.
+  if (recarregar) {
+    location.reload();
+  }
+}
 
 //ADICIONA UM MENU ACIMA DO TITULO
 (function () {
@@ -1224,4 +1377,3 @@ chrome.storage.onChanged.addListener(
         iniciar();
     }
 })();
-
