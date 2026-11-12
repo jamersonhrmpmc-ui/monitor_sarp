@@ -13,7 +13,8 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://sarp.saude.rn.gov.br/*",
+    "https://*/*",
+    "http://*/*",
     "https://ntfy.sh/*"
   ],
   "action": {
@@ -30,6 +31,19 @@
     "type": "module"
   },
   "content_scripts": [
+    {
+      "matches": [
+        "https://*/*",
+        "http://*/*"
+      ],
+      "js": [
+        "content/notifications.js"
+      ],
+      "css": [
+        "content/notifications.css"
+      ],
+      "run_at": "document_end"
+    },
     {
       "matches": ["https://sarp.saude.rn.gov.br/*"],
       "js": ["content/content.js"],

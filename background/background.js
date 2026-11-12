@@ -100,12 +100,21 @@ async function executarMonitoramento() {
     chrome.action.setBadgeBackgroundColor({ color: '#0284c7' });
 
     // Processa os chamados recebidos no JSON
-    await processarChamados( resultado.json );
+    const notificacoesEnviadas = await processarChamados( resultado.json );
 
     await salvarContadores();
 
     // ===== VOLTOU A FUNCIONAR =====
     const { monitorWasOffline = false } = await chrome.storage.session.get('monitorWasOffline');
+
+    if (notificacoesEnviadas && !monitorWasOffline) {
+      try {
+        await chrome.tabs.reload(abaSarp.id);
+        log('[Monitor SARP] Aba SARP recarregada após envio das notificações.');
+      } catch (erro) {
+        console.warn('[Monitor SARP] Não foi possível recarregar a aba SARP após as notificações:', erro);
+      }
+    }
 
     if (monitorWasOffline) {
       // Limpa o flag
@@ -356,8 +365,10 @@ async function processarChamados(json) {
       idsAtuais,
       []
     );
-    return;
+    return false;
   }
+
+  let notificacoesEnviadas = false;
 
   // Comparação com a referencia anterior
   const idsAnteriores = Array.isArray( monitorAnterior.idsAbertos ) ? monitorAnterior.idsAbertos : [];
@@ -369,7 +380,7 @@ async function processarChamados(json) {
   if ( novosChamados.length > 0 ) {
     log( `[Monitor SARP] ${novosChamados.length} NOVO(S) CHAMADO(S)!` );
 
-    await notificarNovosChamados(novosChamados);
+    notificacoesEnviadas = await notificarNovosChamados(novosChamados);
 
     novosChamados.forEach( chamado => { log( '[NOVO CHAMADO]', chamado );});
 
@@ -385,6 +396,8 @@ async function processarChamados(json) {
     idsAtuais,
     novosChamados
   );
+
+  return notificacoesEnviadas;
 }
 
 // Formata a data de forma legível
@@ -479,10 +492,11 @@ function extrairDadosChamado(c) {
 }
 
 // ENVIA AS NOVAS NOTIFICAÇÕES PARA O ntfy
-async function notificarNovosChamados(chamados) {
-  if (!chamados || chamados.length === 0) return;
+async function notificarNovosChamados(chamados, exibirAlerta = true) {
+  if (!chamados || chamados.length === 0) return false;
 
   const loteParaSalvar = [];
+  let todasNotificacoesEnviadas = true;
 
   for (const chamado of chamados) {
     log('[Monitor SARP] Processando notificação:', chamado.numero);
@@ -520,9 +534,13 @@ ${descricaoFinal}
     // Envia para o ntfy
     const { ntfyURL: ntfyUrl } = await chrome.storage.sync.get(['ntfyURL']);
     if (ntfyUrl) {
-      await enviarParaNtfy(mensagem, ntfyUrl);
+      const enviada = await enviarParaNtfy(mensagem, ntfyUrl);
+      if (!enviada) {
+        todasNotificacoesEnviadas = false;
+      }
     } else {
       console.warn('[Monitor SARP] URL do ntfy não configurada');
+      todasNotificacoesEnviadas = false;
     }
 
     // Guarda os dados limpos para o HUD
@@ -546,9 +564,22 @@ ${descricaoFinal}
 
   log('[Monitor SARP] Lote salvo no session:', loteParaSalvar);
 
-  // Avisa o content script (HUD) que tem dados novos
-  const tabs = await chrome.tabs.query({ url: 'https://sarp.saude.rn.gov.br/*' });
-  for (const tab of tabs) {
+  // Avisa as páginas abertas para exibir o alerta flutuante.
+  if (exibirAlerta) {
+    const todasAbas = await chrome.tabs.query({});
+    for (const tab of todasAbas) {
+      if (tab.id) {
+        chrome.tabs.sendMessage(tab.id, {
+          action: 'NOVOS_CHAMADOS_DETECTADOS',
+          quantidade: loteParaSalvar.length
+        }).catch(() => {});
+      }
+    }
+  }
+
+  // Atualiza o HUD apenas nas páginas do SARP.
+  const abasSarp = await chrome.tabs.query({ url: 'https://sarp.saude.rn.gov.br/*' });
+  for (const tab of abasSarp) {
     if (tab.id) {
       chrome.tabs.sendMessage(tab.id, {
         action: 'ATUALIZAR_HUD_CHAMADOS',
@@ -556,6 +587,8 @@ ${descricaoFinal}
       }).catch(() => {});
     }
   }
+
+  return todasNotificacoesEnviadas;
 }
 
 // ENVIA A MENSAGEM PARA O ntfy
@@ -1059,7 +1092,7 @@ async function testeNtfy() {
     }
     log( '[Monitor SARP] Chamados que serão enviados:', chamados);
     // ENVIA TODOS COMO SE FOSSEM NOVOS
-    await notificarNovosChamados( chamados );
+    await notificarNovosChamados(chamados, false);
     log( '[Monitor SARP] ===== FIM DO TESTE DE NOTIFICAÇÃO =====');
   } catch (erro) {
     console.warn( '[Monitor SARP] Erro durante teste de notificação:', erro );

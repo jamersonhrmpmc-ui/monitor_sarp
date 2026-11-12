@@ -19,6 +19,12 @@
 
 > **Importante:** Para Chrome e Edge, utilize o arquivo `manifest.json` destinado a esses navegadores.
 
+## 🔔 Avisos de novos chamados
+
+Quando o monitor detectar chamados novos, a extensão mostra um aviso azul no canto superior direito e adiciona ao título da aba a quantidade de chamados recebidos em qualquer site aberto no navegador. Fechar o aviso também limpa o contador do título naquela aba.
+
+Para essa funcionalidade, a extensão solicita acesso a páginas HTTP e HTTPS, inclusive sites fora do SARP. O conteúdo dessas páginas não é coletado; o script adicional apenas exibe o aviso e atualiza o título da aba.
+
 ---
 
 ## 🦊 Como instalar no Mozilla Firefox

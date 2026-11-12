@@ -1,0 +1,56 @@
+#monitor-sarp-aviso-novos-chamados {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 2147483647;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    width: min(340px, calc(100vw - 32px));
+    padding: 14px 12px 14px 16px;
+    border: 1px solid #93c5fd;
+    border-left: 4px solid #2563eb;
+    border-radius: 10px;
+    background: #eff6ff;
+    color: #1e3a8a;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    box-sizing: border-box;
+}
+
+#monitor-sarp-aviso-novos-chamados .monitor-sarp-aviso-texto {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+#monitor-sarp-aviso-novos-chamados .monitor-sarp-aviso-texto strong {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+#monitor-sarp-aviso-novos-chamados .monitor-sarp-aviso-fechar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    margin: -4px -2px 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: #1e40af;
+    font: inherit;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+#monitor-sarp-aviso-novos-chamados .monitor-sarp-aviso-fechar:hover {
+    background: #dbeafe;
+}
