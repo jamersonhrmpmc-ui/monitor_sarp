@@ -115,7 +115,7 @@ chrome.runtime.onMessage.addListener(
     }
 
     // ATUALIZA PÁGINA
-    if (request.action === 'ATT_PAG') {
+    if (request.action === 'ATT_PAG' && paginaChamados) {
       log('[Monitor SARP] Atualizando página...');
       sendResponse({
         success: true
@@ -737,7 +737,7 @@ function fecharAvisoOffline(recarregar = false) {
 
   // Neste fluxo o reload é feito pelo background.
   // Mantemos o parâmetro só por segurança, mas não usamos mais.
-  if (recarregar) {
+  if (recarregar && paginaChamados) {
     location.reload();
   }
 }

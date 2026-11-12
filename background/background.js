@@ -8,6 +8,47 @@ log('[Monitor SARP] Background Service Worker inicializado.');
 
 const ENDPOINT = 'https://sarp.saude.rn.gov.br/ti/chamados/getChamados';
 const ALARM_NAME = 'monitorSarpPulse';
+const SARP_URL_PATTERN = 'https://sarp.saude.rn.gov.br/*';
+const CHAMADOS_LIST_PATH = '/ti/chamados';
+
+async function buscarAbasDaListaDeChamados() {
+  const abasSarp = await chrome.tabs.query({ url: SARP_URL_PATTERN });
+
+  return abasSarp.filter((aba) => {
+    if (!aba.url) {
+      return false;
+    }
+
+    try {
+      const url = new URL(aba.url);
+      return url.origin === 'https://sarp.saude.rn.gov.br' &&
+        url.pathname === CHAMADOS_LIST_PATH;
+    } catch (erro) {
+      console.warn('[Monitor SARP] URL de aba inválida:', aba.url, erro);
+      return false;
+    }
+  });
+}
+
+async function recarregarAbasDaListaDeChamados() {
+  const abas = await buscarAbasDaListaDeChamados();
+
+  for (const aba of abas) {
+    if (!aba.id) {
+      continue;
+    }
+
+    try {
+      await chrome.tabs.reload(aba.id);
+    } catch (erro) {
+      console.warn(
+        '[Monitor SARP] Não foi possível recarregar a aba da lista de chamados:',
+        aba.id,
+        erro
+      );
+    }
+  }
+}
 
 // RESTAURAR BADGE (TAG ON / OFF)
 async function restoreBadge() {
@@ -109,10 +150,10 @@ async function executarMonitoramento() {
 
     if (notificacoesEnviadas && !monitorWasOffline) {
       try {
-        await chrome.tabs.reload(abaSarp.id);
-        log('[Monitor SARP] Aba SARP recarregada após envio das notificações.');
+        await recarregarAbasDaListaDeChamados();
+        log('[Monitor SARP] Abas da lista de chamados recarregadas após envio das notificações.');
       } catch (erro) {
-        console.warn('[Monitor SARP] Não foi possível recarregar a aba SARP após as notificações:', erro);
+        console.warn('[Monitor SARP] Não foi possível recarregar as abas da lista de chamados após as notificações:', erro);
       }
     }
 
@@ -120,16 +161,14 @@ async function executarMonitoramento() {
       // Limpa o flag
       await chrome.storage.session.set({ monitorWasOffline: false });
 
-      // Recarrega as abas do SARP (mesmo se estiver na tela de erro do Chrome)
+      // Avisa todas as páginas do SARP, mas recarrega somente a lista de chamados.
       const tabsOnline = await chrome.tabs.query({ url: 'https://sarp.saude.rn.gov.br/*' });
       for (const tab of tabsOnline) {
         if (tab.id) {
-          // Tenta avisar o content (se existir)
           chrome.tabs.sendMessage(tab.id, { action: 'MONITOR_ONLINE' }).catch(() => {});
-          // Força o reload da aba (resolve a tela de erro do navegador)
-          chrome.tabs.reload(tab.id);
         }
       }
+      await recarregarAbasDaListaDeChamados();
     }
 
   } catch (erro) {
@@ -790,13 +829,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       chrome.action.setBadgeText({ text: isActive ? 'ON' : 'OFF' });
       chrome.action.setBadgeBackgroundColor({ color: isActive ? '#0284c7' : '#64748b' });
 
-      // Manda o comando de atualizar pagina pra o content
-      const abas = await chrome.tabs.query({ url: 'https://sarp.saude.rn.gov.br/ti/chamados*' });
-      for (const aba of abas) {
-        if (aba.id) {
-          chrome.tabs.sendMessage(aba.id, { action: 'ATT_PAG' }).catch(() => {});
-        }
-      }
+      // Atualiza todas as abas da lista, sem recarregar páginas de detalhes.
+      await recarregarAbasDaListaDeChamados();
 
       // Se acabou de ativar consulta imediatamente
       if (isActive) {
@@ -1037,16 +1071,8 @@ chrome.storage.onChanged.addListener(
 
       await chrome.storage.session.remove('sarpMonitor');
 
-      // Recarrega somente a página principal de chamados
-      const tabs = await chrome.tabs.query({
-        url: 'https://sarp.saude.rn.gov.br/ti/chamados'
-      });
-
-      for (const tab of tabs) {
-        if (tab.id) {
-          chrome.tabs.reload(tab.id);
-        }
-      }
+      // Recarrega todas as abas da lista, sem recarregar páginas de detalhes.
+      await recarregarAbasDaListaDeChamados();
     }
   }
 );
